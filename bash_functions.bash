@@ -1,13 +1,4 @@
-# add RSA key to ssh-agent
-addkey() {
-  if [ -z "$1" ]; then
-    test -f ~/.ssh/id_rsa && ssh-add ~/.ssh/id_rsa
-    test -f ~/.ssh/ltm_shared_key.key && ssh-add ~/.ssh/ltm_shared_key.key
-    test -f ~/.ssh/git_itc.key && ssh-add ~/.ssh/git_itc.key
-  else
-    ssh-add $1
-  fi
-}
+# functions to speed up common tasks when working with BIG-IP
 
 # start the ssh-agent using whatever $SSH_AUTH_SOCK is defined
 startagent() {
@@ -18,8 +9,13 @@ startagent() {
     return
   else
     eval $(ssh-agent -a $SSH_AUTH_SOCK)
-    # see function above
-    addkey
+    if [ -n "$1" ]; then
+      ssh-add $1
+    else
+      test -f ~/.ssh/id_rsa && ssh-add ~/.ssh/id_rsa
+      test -f ~/.ssh/ltm_shared_key.key && ssh-add ~/.ssh/ltm_shared_key.key
+      test -f ~/.ssh/git_itc.key && ssh-add ~/.ssh/git_itc.key
+    fi
   fi
 }
 
@@ -104,7 +100,7 @@ watchhost() {
   done
 }
 
-# flash the screen after the given number of seconds (as a reminder)
+# continually flash the screen after the given number of seconds has elapsed
 reminder() {
   if [ -z "$1" ]; then timer=180;
   else
@@ -116,5 +112,23 @@ reminder() {
   sleep $timer
 
   while [ 1 ]; do echo -e "\a"; sleep 1; done
+}
+
+# copy the latest version of env.ltm to the target LTM
+update_env() {
+  if [ -z "$1" ]; then
+    echo "USAGE: update_env <ltm_host> [source env.ltm]"
+    echo "'source env.ltm' defaults to $HOME/ltm_helpers/env.ltm'"
+    exit 1
+  else
+    host=$1
+  fi
+
+  if [ -n "$2" ]; then envfile=$2
+  else envfile="$HOME/ltm_helpers/env.ltm"
+  fi
+
+  scp $envfile $host:.env.ltm
+
 }
 
