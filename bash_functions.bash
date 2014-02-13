@@ -62,14 +62,16 @@ ltm_env() {
   # copy the new environment file into place
   scp ${ENVFILE} root@${host}:.env.ltm
 
+  # comment out the 'clear' in .bash_logout
+  ssh root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
+
   # update existing .bash_profile to source new environment file
   ssh root@${host} "echo \"alias src='cd ;. ~/.env.ltm'\">> .bash_profile"
+  ssh root@${host} "echo \". ~/.env.ltm\">> .bash_profile"
 
   # stop printing the motd on login
   ssh root@${host} "touch .hushlogin"
 
-  # comment out the 'clear' in .bash_logout
-  ssh root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
 }
 
 # monitor a host and alert when the system starts responding to pings
