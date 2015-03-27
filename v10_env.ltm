@@ -1,22 +1,17 @@
-# $HOME/Dropbox/dev/ltm_helpers
-
-#####################################################
-# Creates several command aliases, generates custom bash & tmsh prompts,
-# and defines several bash functions. 
-#
-# Copyright, F5 Networks, 2009-2015
-# Written by: Jesse Driskill, ITC Systems Engineer
-#####################################################
-
+# /shared/bin/env.ltm
 
 # use vi-mode cli
 set -o vi
 
-# enable DEBUG mode
-export DEBUG=0
+# test test test test test test test 
+
+# add /shared/bis to the PATH
+PATH=/shared/bin:$PATH
 
 # Define some environment vars
+export TERM=screen
 export EDITOR=vi
+export CTRL='172.27.253.65'
 
 
 # Aliases should be in here.
@@ -29,29 +24,23 @@ alias last='last -20'
 alias resource="source /shared/bin/env.ltm"
 
 ## F5-specific aliases
-alias t=tmsh
-alias conf=tmsh
-alias quit=exit
 alias slot1='ssh slot1'
 alias slot2='ssh slot2'
 alias slot3='ssh slot3'
 alias slot4='ssh slot4'
-alias slot5='ssh slot5'
-alias slot6='ssh slot6'
-alias slot7='ssh slot7'
-alias slot8='ssh slot8'
+alias t=tmsh
+alias conf=tmsh
+alias quit=exit
 alias ssc='tmsh save sys config'
 alias bt-vips='bigtop -n -vname -delay 1 -nodes 0 -conn -delta'
 alias bt-nums='bigtop -n -delay 1 -nodes 0 -conn -delta'
-alias bt-vname='bigtop -n -vname -delay 1 -nodes 0 -conn'
 alias bt-pkts='bigtop -n -delay 1 -nodes 0 -pkts -delta'
 alias bt-nodes='bigtop -n -delay 1 -vips 0 -conn -delta'
 alias listprofiles='tmsh list ltm profile | grep profile'
 alias shownodes="tmsh list ltm node | awk /^ltm/'{print $3}'"
 alias listvips="tmsh list ltm virtual | awk /^ltm/'{print $3}'"
-alias showmem='tmsh show sys tmm-info raw | grep -E "Sys|Memory|Avail|Used|--"'
-alias watchmem='watch "tmsh show sys tmm-info raw | grep -E \"Sys|Memory|Avail|Used|--\""'
-alias getmem="tmsh sh sys tmm-info global"
+alias showtmm='tmsh show sys tmm-info raw | grep -E "Sys|Memory|Avail|Used|--"'
+alias watchtmm='watch "tmsh show sys tmm-info raw | grep -E \"Sys|Memory|Avail|Used|--\""'
 alias showintstats="tmsh reset-stats net interface; watch -n 1 'tmsh show net interface'"
 alias showsoftware="tmsh show sys software | awk '/BIGIP/ { print $4 }'"
 alias getver='head -5 /VERSION'
@@ -59,29 +48,28 @@ alias tmctl='tmctl -w 100'
 alias tmstat='tmstat summary'
 alias huptmm='tmsh restart sys service tmm'
 alias getTmmConns="tmsh show sys traffic raw | awk '/Current Conn/ {print \$1,\$2,\$3}'"
+alias getmem="tmsh sh sys tmm-info global"
 alias failover="tmsh run sys failover standby"
 alias offline="tmsh run sys failover offline"
 alias online="tmsh run sys failover online"
-alias clearpersist="tmsh delete ltm persistence persist-records"
-alias showconns='tmsh show sys tmm-traffic global | grep Current'
-alias showtmmconns='tmsh show sys tmm-traffic | grep -E "Sys|Current"'
-alias clearconns='tmsh delete sys conn all'
-
-alias watchApmSessions='watch -n5 "sessiondump -list | wc -l"'
-alias listApmSessions='sessiondump -list | wc -l'
+alias mytail="tail -f /var/log/ltm | grep -v Tcpdump"
+alias sync="tmsh run sys config-sync"
 
 
 ## Functions
 # push a config-sync to the device-group
-sync() {
-  if [ -n "$1" ]; then
-    syncgroup=$1
-  else
-    syncgroup=$(tmsh list cm device-group one-line | awk /sync-failover/'{print $3}')
-  fi
-  echo "Syncing local config to $syncgroup"
-  tmsh run cm config-sync to-group $syncgroup
-}
+#sync() {
+#  if [ -n "$1" ]; then
+#    tmsh run cm config-sync to-group $1
+#  else
+#    syncgroup=$(tmsh list cm device-group one-line | awk /sync-failover/'{print $3}')
+#    echo "Syncing local config to $syncgroup"
+#    tmsh run cm config-sync to-group $syncgroup
+#  fi
+#}
+
+alias watchApmSessions='watch -n5 "sessiondump -list | wc -l"'
+alias listApmSessions='sessiondump -list | wc -l'
 
 killApmSessionsall() {
   SESSIONS=$(sessiondump -list | awk '{ print $1 }')
@@ -105,24 +93,16 @@ killApmSessionsbot() {
   for s in $sess; do sessiondump -delete $s; done
 }
 
-getvlans() {
-  vlans=$(tmsh list net vlan | awk '/vlan/{print $3}')
-  for v in $vlans; do
-    tmsh show net vlan $v | head -8
-  done
-}
-
 # relicense the system, either with the specified regkey (if provided) or with the
 # previous key (from bigip.license).
 #alias rl="SOAPLicenseClient --basekey $(awk /Registration/' { print $4 }' /config/bigip.license)"
 relicense() {
-  if [ -n "$1" ]; then
-    key=$1
+  if [ -z "$1" ]; then
+    echo "Running: SOAPLicenseClient --verbose --basekey $(awk '/Reg/ {print $4}' /config/bigip.license)"
+    SOAPLicenseClient --verbose --basekey $(awk '/Reg/ {print $4}' /config/bigip.license)
   else
-    key=$(awk '/Reg/ { print $4 }' /config/bigip.license)
+    SOAPLicenseClient --verbose --basekey $1
   fi
-  echo "Running: SOAPLicenseClient --verbose --basekey $key"
-  SOAPLicenseClient --verbose --basekey $key 
 }
 
 # Force mcpd to load from config files on one or all blades
@@ -169,44 +149,23 @@ clearstats() {
   fi
 }
 
-showpersist() {
-  nodes=$*
-  if [[ -z "$nodes" ]]; then
-    echo "USAGE: showpersist nodeaddr1 [nodeaddr2 ...]"
-    return
-  fi
-
-  while (true); do
-    tmsh show ltm persistence persist-records >/tmp/persist_records.txt
-    for n in $nodes; do
-      echo "$n: $(grep -c $n /tmp/persist_records.txt)"
-    done
-    rm /tmp/persist_records.txt
-    sleep 5
-  done
-}
-
 syncslots() {
-  if [[ -n "$1" ]]; then
-    SLOT=$1
-  else
+  if [[ -z "$1" ]]; then
+    echo "Please specify the slot to be sync'd"
     echo "USAGE: syncslots slot<ID> (EX: syncslots slot3)"
     return
+  else
+    SLOT=$1
   fi
-
-  test -f /shared/env.ltm || {
+  test -f /root/.env.ltm || {
     echo "/root/.env.ltm does not exist. Exiting..."
     return
   }
 
-  scp /shared/env.ltm ${SLOT}:/shared/env.ltm
-  scp /shared/vimrc.ltm ${SLOT}:/shared/vimrc.ltm
-  ssh $SLOT "ln -sf /shared/env.ltm .env.ltm"
-  ssh $SLOT "ln -sf /shared/vimrc.ltm .vimrc"
-
+  scp /root/.env.ltm ${SLOT}:
   ssh $SLOT "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
-  ssh $SLOT "echo \"alias src='. /shared/env.ltm'\">> .bash_profile"
-  ssh $SLOT "echo \"source /shared/env.ltm\">> .bash_profile"
+  ssh $SLOT "echo \"alias src='. /root/.env.ltm'\">> .bash_profile"
+  ssh $SLOT "echo \"source /root/.env.ltm\">> .bash_profile"
   ssh $SLOT "touch .hushlogin"
   ssh $SLOT "sed -i -e \"s/^clear/#clear/\" .bash_logout"
 }
@@ -242,7 +201,6 @@ done
 
 ### define the custom prompt
 PROMPT_DIRTRIM=4
-TITLE="\[\e]0;\h\a"
 BLINK="\[\e[5m\]"
 CLR="\[\e[0m\]"
 GREEN="\[\e[0;32m\]"
@@ -260,136 +218,99 @@ WHITE="\[\e[1;37m\]"
 
 
 export PLATFORM=$(awk 'BEGIN{FS = "="}; /platform/ {print $2}' /PLATFORM)
+active="Active"
+standby="Standby"
 v10="10.*"
 v11="11.*"
-v4="4.*"    # BIG-IQ
 
-# color status
-good="green"
-bad="red"
 
 #custom prompt
 mk_prompt () { 
-  # sometimes, at least in v9-10.x, the chassis put things in different locations...
-  case $PLATFORM in
-    "A100")
-      export VIPRION=1
-      ;;
-    "A107")
-      export VIPRION=1
-      ;;
-    "A108")
-      export VIPRION=1
-      ;;
-    "A109")
-      export VIPRION=1
-      ;;
-    "A110")
-      export VIPRION=1
-      ;;
-    "A111")
-      export VIPRION=1
-      ;;
-    "A112")
-      export VIPRION=1
-      ;;
-    "A113")
-      export  VIPRION=1
-      ;;
-    *)
-      export VIPRION=0
-      ;;
-  esac
+  # populate status environment vars
+  #read mcpPhase      < /var/prompt/mcpPhase
+  #read mcpLoadStatus < /var/prompt/mcpLoadStatus
+  read promptStatus  < /var/prompt/ps1
 
-  # Get failover state
-  read pStatus  < /var/prompt/ps1
-  # Get sync status
-  if [ -f /var/prompt/cmiSyncStatus ]; then read SYNC < /var/prompt/cmiSyncStatus; else SYNC="Unknown"; fi
-  goodFO="(Active|Standby|Standalone|Offline|INOPERATIVE)"
-  single="(Standalone)"
-  if [[ "$SYNC" =~ $single ]]; then
-    STANDALONE=${BASH_REMATCH[0]}
-  fi
+  # legacy variables
+  read fstatus < /var/prompt/ps1
+  read bstatus < /var/prompt/ps1
 
-  if [[ $VIPRION -gt 0 ]]; then # viprion platform
-    #echo "viprion detected"
-    if [ -f /SLOT ]; then read SLOT < /SLOT; else SLOT=0; fi
+    # sometimes, at least in v9-10.x, the chassis put things in different locations...
+    case $PLATFORM in
+      "A100")
+        export VIPRION=1
+        ;;
+      "A107")
+        export VIPRION=1
+        ;;
+      "A108")
+        export VIPRION=1
+        ;;
+      "A109")
+        export VIPRION=1
+        ;;
+      "A110")
+        export VIPRION=1
+        ;;
+      "A111")
+        export VIPRION=1
+        ;;
+      "A112")
+        export VIPRION=1
+        ;;
+      *)
+        export VIPRION=0
+        ;;
+    esac
 
-    fullStatus="\/(S[12345678])-([[:alpha:]]*)?-([PS]):(Active|Standby|Offline|INOPERATIVE)"
-    if [[ "$pStatus" =~ $fullStatus ]]; then
-      #SLOT=${BASH_REMATCH[1]}
-      STATUS=${BASH_REMATCH[2]}
-      haState=${BASH_REMATCH[3]}
-      FO=${BASH_REMATCH[4]}
 
-      if   [ "$haState" == "P" ]; then pri="Pri"
-      elif [ "$haState" == "S" ]; then pri="Sec"
-      else pri="unknown"
+    if [[ $VIPRION -gt 0 ]]; then
+      if [ -f /SLOT ]; then read SLOT < /SLOT; else SLOT=0; fi
+      sync_status=$(b config sync show | awk /Status/'{ print $2 }')
+      if   [ "$sync_status" = "disabled" ]; then SYNC="Standalone"
+      elif [ $sync_status -eq 0 ]; then SYNC="In Sync"
+      elif [ $sync_status -gt 0 ]; then SYNC="Not in Sync"
       fi
 
-      #if [[ "$STATE" =~ "Active" || "$STATE" =~ "Standby" ]]; then
-      if [[ "$FO" =~ $goodFO ]]; then
-          if [[ "$SYNC" != "In Sync" && "$SYNC" != "Standalone" ]]; then
-            PS1="${TITLE}${LTCYAN}Slot: ${SLOT}, ${FO}, ${SYNC}${CLR}\n\h:\w >"
-          else
-            PS1="${TITLE}${GREEN}Slot: ${SLOT}, ${FO}, ${SYNC}${CLR}\n\h:\w >"
-          fi
-      else  # System is not in Active or Standby FO state
-        PS1="${RED}Slot: ${SLOT}, ($FO), ${SYNC}${CLR}\n\h:\w >"
-      fi
-    fi
-  elif [[ "$STANDALONE" =~ $single ]]; then # Appliance, redundant
-    echo "Redundant Appliance ($STANDALONE)"
-    #fullStatus='\/S([12345678])-([[:alpha:]]*)-(P|S):([[:alpha:]]*)'
-    #if [[ "$pStatus" =~ $fullStatus ]]; then
-    #  SLOT=${BASH_REMATCH[1]}
-    #  COLORSTAT=${BASH_REMATCH[2]}
-    #  haState=${BASH_REMATCH[3]}
-    #  FO=${BASH_REMATCH[4]}
+      fullstatus="\/(S[1234])-?([[:alpha:]]*)?-([PS]):(Active|Standby|Offline|INOPERATIVE)"
+      statusColor=""
+      if [[  "$promptStatus" =~ $fullstatus ]]; then
+        STATUS=${BASH_REMATCH[2]}
+        PRIORITY=${BASH_REMATCH[3]}
+        STATE=${BASH_REMATCH[4]}
 
-    #  if   [ "$haState" == "P" ]; then pri="Pri"
-    #  elif [ "$haState" == "S" ]; then pri="Sec"
-    #  else pri="unknown"
-    #  fi
-    fullStatus="(Active|Standby|Standalone|Offline|INOPERATIVE)"
-    if [[ "$FO" =~ $goodFO ]]; then
-      if [[ "$SYNC" != "In Sync" && "$SYNC" != "Standalone" ]]; then #Unknown sync state
-        PS1="${TITLE}${LTCYAN}${pStatus}, ${SYNC}${CLR}\n\h:\w >"
-      elif [[ "$COLORSTAT" =~ $good ]]; then
-        (($DEBUG)) && echo "1"
-        PS1="${TITLE}${GREEN}Slot ${SLOT}, ${FO}, ${SYNC}${CLR}\n\h:\w >"
+        if [ "$PRIORITY" == "P" ]; then
+          pri="Pri"
+        elif [ "$PRIORITY" == "S" ]; then
+          pri="Sec"
+        else
+          pri="unknown"
+        fi
+
+        if [ "$STATE" == "Active" -o "$STATE" == "Standby" ]; then
+            if [ "$SYNC" != "In Sync" -a "$SYNC" != "Standalone" ]; then
+              PS1="${LTCYAN}Slot: ${SLOT}, ${STATE}, ${SYNC}${CLR}\n\h:\w >"
+            else
+              PS1="${GREEN}Slot: ${SLOT}, ${STATE}, ${SYNC}${CLR}\n\h:\w >"
+            fi
+        else
+          PS1="${RED}Slot: ${SLOT}, ($STATE), ${SYNC}${CLR}\n\h:\w >"
+        fi
+      fi
+    else # not a viprion
+      #echo "Appliance detected"
+      fullstatus="\/(S[1234])-([PS]):(Active|Standby)"
+      if [[ "$bstatus" =~ "$active" || "$bstatus" =~ "$standby" ]]; then
+        PS1="${GREEN}$bstatus${CLR}\n\h:\w >";
       else
-        (($DEBUG)) && echo "2"
-        PS1="${TITLE}${BLUE}Slot ${SLOT}, ${FO}, ${SYNC} (Unknown color status: ${COLORSTAT})${CLR}\n\h:\w >"
+        PS1="${RED}($bstatus)${CLR}\n\h:\w >";
       fi
-    else # Unknown Failover state ($FO)
-      PS1=${TITLE}"${YELLOW}Slot ${SLOT}, ${FO}, ${SYNC} (Unknown failover state: ${FO})${CLR}\n\h:\w >"
-    fi
-    #else # System is not in Active or Standby
-    #  PS1="${RED}($pStatus), ${SYNC}${CLR}\n\h:\w >";
-    #fi
-  else # standalone appliance
-    #echo "Standalone Appliance ($STANDALONE)"
-    fullStatus="(Active|Standby|Standalone|Offline|INOPERATIVE)"
-    #fullStatus='([[:alpha:]]*)'
-    #fullStatus="\/S([12345678])-([[:alpha:]]*)?-([PS]):(Active|Standby|Offline|INOPERATIVE)"
-    if [[ "$pStatus" =~ $fullStatus ]]; then
-      FO=${BASH_REMATCH[1]}
-      (($DEBUG)) && echo "${BASH_REMATCH[1]}, $pStatus"
-
-      if [[ "$FO" =~ $goodFO ]]; then
-        (($DEBUG)) && echo "3"
-        PS1=${TITLE}"${GREEN}${FO}, ${SYNC}${CLR}\n\h:\w >"
-      else
-        (($DEBUG)) && echo "4"
-        PS1=${TITLE}"${BLUE}${SYNC} (Unknown color status: ${COLORSTAT})${CLR}\n\h:\w >"
+      if [[ "$VERSION" =~ "$v10" ]]; then
+        if [ "$bstatus" != "$fstatus" ]; then
+          echo "Status reported by '/bin/ps1' does not match '/var/prompt/ps1'"
+        fi
       fi
-    else # System is not in Active or Standby
-      echo "5"
-      echo "SLOT: $SLOT, COLORSTAT: $COLORSTAT, haState: $haState, FO: $FO, STANDALONE: $STANDALONE"
-      PS1=${TITLE}"${RED}($pStatus), ${SYNC}${CLR}\n\h:\w >";
     fi
-  fi  
 }
       
 export PROMPT_COMMAND=mk_prompt
@@ -397,11 +318,8 @@ export PROMPT_COMMAND=mk_prompt
 # create some tmsh aliases
 mk_tmsh_aliases() {
   VERSION=$(awk '/Version/ { print $2 }' /VERSION)
-  if [[ "$VERSION" =~ "$v11" || "$VERSION" =~ "$v4" ]]; then
+  if [[ "$VERSION" =~ "$v11" ]]; then
     #v11.x
-    echo "Creating aliases for v11.x (BIG-IQ v4.x)"
-    tmsh modify cli preference history-date-time enabled 2>/dev/null
-    tmsh modify cli preference keymay vi 2>/dev/null
     tmsh modify cli preference editor vi tcl-syntax-highlighting enabled
     tmsh modify cli preference prompt { host status current-folder multi-line } 2>/dev/null
     tmsh create cli alias shared exit command "quit" 2>/dev/null
@@ -421,7 +339,6 @@ mk_tmsh_aliases() {
     tmsh modify sys db ui.system.preferences.advancedselection value advanced
   else
     #v10.2.x
-    echo "Creating aliases for v10.x"
     tmsh modify cli preference editor vi
     tmsh modify cli preference prompt { host status multi-line }
     tmsh create cli alias ping command "run util ping" 2>/dev/null
@@ -457,4 +374,4 @@ mk_default() {
 #     getConfigSyncStatus getMcpLoadStatus getMcpPhase getPromptStatus
 
 
-# ex: set syntax=sh tabstop=2 expandtab: 
+# vim: syntax=sh ts=2 st=2

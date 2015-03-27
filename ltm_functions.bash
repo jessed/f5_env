@@ -1,23 +1,26 @@
+# ltm_helpers.bash
+
 # functions to speed up common tasks when working with BIG-IP
 
+## MOVE startagent() to shared bash_functions file
 # start the ssh-agent using whatever $SSH_AUTH_SOCK is defined
-startagent() {
-  if [[ -z "$SSH_AUTH_SOCK" ]]; then
-    echo "ERROR: $SSH_AUTH_SOCK not defined"
-    echo "Specify it manually in .profile or .bashrc to ensure"
-    echo "that all of your shells use the same one."
-    return
-  else
-    eval $(ssh-agent -a $SSH_AUTH_SOCK)
-    if [ -n "$1" ]; then
-      ssh-add $1
-    else
-      test -f ~/.ssh/id_rsa && ssh-add ~/.ssh/id_rsa
-      test -f ~/.ssh/ltm_shared_key.key && ssh-add ~/.ssh/ltm_shared_key.key
-      test -f ~/.ssh/git_itc.key && ssh-add ~/.ssh/git_itc.key
-    fi
-  fi
-}
+#startagent() {
+#  if [[ -z "$SSH_AUTH_SOCK" ]]; then
+#    echo "ERROR: $SSH_AUTH_SOCK not defined"
+#    echo "Specify it manually in .profile or .bashrc to ensure"
+#    echo "that all of your shells use the same one."
+#    return
+#  else
+#    eval $(ssh-agent -a $SSH_AUTH_SOCK)
+#    if [ -n "$1" ]; then
+#      ssh-add $1
+#    else
+#      test -f ~/.ssh/id_rsa && ssh-add ~/.ssh/id_rsa
+#      test -f ~/.ssh/ltm_shared_key.key && ssh-add ~/.ssh/ltm_shared_key.key
+#      test -f ~/.ssh/git_itc.key && ssh-add ~/.ssh/git_itc.key
+#    fi
+#  fi
+#}
 
 # send the specified public key to the ~/.ssh/authorized_keys file on the remote host
 # SYNTAX:       synckey <host> [user] [/path/to/public/key]
@@ -36,8 +39,8 @@ synckey() {
   if [ -z "$3" ]; then KEY="$HOME/.ssh/ltm_shared_key.pub"; else KEY=$3; fi
 
   KEYS=$(cat $KEY)
-  echo "Sending $KEY to $HOST for $USER"
-  echo "ssh ${USER}@${HOST} \"echo $(< $KEY) >> ~/.ssh/authorized_keys\""
+  #echo "Sending $KEY to $HOST for $USER"
+  #echo "ssh ${USER}@${HOST} \"echo $(< $KEY) >> ~/.ssh/authorized_keys\""
   ssh ${USER}@${HOST} "echo $(< $KEY) >> ~/.ssh/authorized_keys"
 }
 
@@ -46,28 +49,31 @@ synckey() {
 # command, which sources the ~/.env.ltm
 # SYNTAX:  ltm_env <host>
 ltm_env() {
-  if [[ -z "$1" ]]; then
-    echo "USAGE: ltm_env <ltm_host> [env file]"
-    return
-  else
-    host=$1
-  fi
+  local ENVFILE="${HOME}/ltm_helpers/env.ltm"
+  local VIMRC="${HOME}/ltm_helpers/vimrc.ltm"
 
-  if [[ -z "$2" ]]; then
-    local ENVFILE="${HOME}/misc/env.ltm"
+  if [[ -n "$1" ]]; then
+    host=$1
   else
-    local ENVFILE=$2
+    echo "USAGE: ltm_env <ltm_host>"
+    return
   fi
 
   # copy the new environment file into place
-  scp ${ENVFILE} root@${host}:.env.ltm
+  scp ${ENVFILE} root@${host}:/shared/env.ltm
+  scp ${VIMRC}   root@${host}:/shared/vimrc.ltm
+  ssh root@${host} "ln -sf /shared/env.ltm .env.ltm"
+  ssh root@${host} "ln -sf /shared/vimrc.ltm .vimrc"
+
+  # update existing .bash_profile to source new environment file
+  ssh root@${host} "echo \"alias src='cd ; source /shared/env.ltm'\">> .bash_profile"
+  ssh root@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
+
+  #  don't change to the /config directory on login
+  ssh root@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
 
   # comment out the 'clear' in .bash_logout
   ssh root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
-
-  # update existing .bash_profile to source new environment file
-  ssh root@${host} "echo \"alias src='cd ;. ~/.env.ltm'\">> .bash_profile"
-  ssh root@${host} "echo \". ~/.env.ltm\">> .bash_profile"
 
   # stop printing the motd on login
   ssh root@${host} "touch .hushlogin"
@@ -118,19 +124,16 @@ reminder() {
 
 # copy the latest version of env.ltm to the target LTM
 update_env() {
-  if [ -z "$1" ]; then
-    echo "USAGE: update_env <ltm_host> [source env.ltm]"
+  ENVFILE="${HOME}/ltm_helpers/env.ltm"
+
+  if [ -n "$1" ]; then
+    host=$1
+  else
+    echo "USAGE: update_env <ltm_host>"
     echo "'source env.ltm' defaults to $HOME/ltm_helpers/env.ltm'"
     exit 1
-  else
-    host=$1
   fi
 
-  if [ -n "$2" ]; then envfile=$2
-  else envfile="$HOME/ltm_helpers/env.ltm"
-  fi
-
-  scp $envfile $host:.env.ltm
-
+  scp $ENVFILE $host:/shared/env.ltm
+  ssh $host "ln -sf /shared/env.ltm .env.ltm"
 }
-
