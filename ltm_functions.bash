@@ -1,26 +1,5 @@
 # ltm_helpers.bash
-
 # functions to speed up common tasks when working with BIG-IP
-
-## MOVE startagent() to shared bash_functions file
-# start the ssh-agent using whatever $SSH_AUTH_SOCK is defined
-#startagent() {
-#  if [[ -z "$SSH_AUTH_SOCK" ]]; then
-#    echo "ERROR: $SSH_AUTH_SOCK not defined"
-#    echo "Specify it manually in .profile or .bashrc to ensure"
-#    echo "that all of your shells use the same one."
-#    return
-#  else
-#    eval $(ssh-agent -a $SSH_AUTH_SOCK)
-#    if [ -n "$1" ]; then
-#      ssh-add $1
-#    else
-#      test -f ~/.ssh/id_rsa && ssh-add ~/.ssh/id_rsa
-#      test -f ~/.ssh/ltm_shared_key.key && ssh-add ~/.ssh/ltm_shared_key.key
-#      test -f ~/.ssh/git_itc.key && ssh-add ~/.ssh/git_itc.key
-#    fi
-#  fi
-#}
 
 # send the specified public key to the ~/.ssh/authorized_keys file on the remote host
 # SYNTAX:       synckey <host> [user] [/path/to/public/key]
@@ -39,8 +18,6 @@ synckey() {
   if [ -z "$3" ]; then KEY="$HOME/.ssh/ltm_shared_key.pub"; else KEY=$3; fi
 
   KEYS=$(cat $KEY)
-  #echo "Sending $KEY to $HOST for $USER"
-  #echo "ssh ${USER}@${HOST} \"echo $(< $KEY) >> ~/.ssh/authorized_keys\""
   ssh ${USER}@${HOST} "echo $(< $KEY) >> ~/.ssh/authorized_keys"
 }
 
@@ -120,20 +97,4 @@ reminder() {
   sleep $timer
 
   while [ 1 ]; do echo -e "\a"; sleep 1; done
-}
-
-# copy the latest version of env.ltm to the target LTM
-update_env() {
-  ENVFILE="${HOME}/ltm_helpers/env.ltm"
-
-  if [ -n "$1" ]; then
-    host=$1
-  else
-    echo "USAGE: update_env <ltm_host>"
-    echo "'source env.ltm' defaults to $HOME/ltm_helpers/env.ltm'"
-    exit 1
-  fi
-
-  scp $ENVFILE $host:/shared/env.ltm
-  ssh $host "ln -sf /shared/env.ltm .env.ltm"
 }
