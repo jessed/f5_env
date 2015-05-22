@@ -57,34 +57,6 @@ ltm_env() {
 
 }
 
-# monitor a host and alert when the system starts responding to pings
-# doesn't initialize the notification until after the system stops responding
-watchhost() {
-  go=1
-  while [ $go -eq 1 ]; do
-    ping -c1 -W 1 $1 >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-      #echo "ping succeeded, sleeping"
-      sleep 1
-    else
-      #echo "ping failed, setting go = 0"
-      echo "No echo response, entering notification phase"
-      go=0
-      sleep 1
-    fi
-  done
-
-  while [ 1 ]; do
-    ping -c1 $1 >/dev/null 2>&1
-    if [ $? -ne 0 ]; then
-      sleep 1
-    else
-      echo -e "$1 is up\a"
-      sleep 1
-    fi
-  done
-}
-
 # continually flash the screen after the given number of seconds has elapsed
 reminder() {
   if [ -z "$1" ]; then timer=180;
@@ -98,3 +70,35 @@ reminder() {
 
   while [ 1 ]; do echo -e "\a"; sleep 1; done
 }
+
+
+### watchhost() moved to default bash_functions
+
+# monitor a host and alert when the system starts responding to pings
+# doesn't initialize the notification until after the system stops responding
+#watchhost() {
+#  go=1
+#  while [ $go -eq 1 ]; do
+#    ping -c1 -W 1 $1 >/dev/null 2>&1
+#    if [ $? -eq 0 ]; then
+#      #echo "ping succeeded, sleeping"
+#      sleep 1
+#    else
+#      #echo "ping failed, setting go = 0"
+#      echo "No echo response, entering notification phase"
+#      go=0
+#      sleep 1
+#    fi
+#  done
+#
+#  while [ 1 ]; do
+#    ping -c1 $1 >/dev/null 2>&1
+#    if [ $? -ne 0 ]; then
+#      sleep 1
+#    else
+#      echo -e "$1 is up\a"
+#      sleep 1
+#    fi
+#  done
+#}
+
