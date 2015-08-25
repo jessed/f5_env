@@ -36,27 +36,29 @@ my $DEBUG   = $opts{'D'} || 0;
 # Eventually most of these will be controllable through cli options
 my $cfg  = {
   'mkTotal'         =>  ($opts{'c'} || 10), # The total number of objects to create
-  'uniqueVipAddr'   =>  1,          # 0: use same address, increment ports. 1: unique adresses, same port
   'printVips'       =>  1,          # 
+  'printPools'      =>  1,          # 
+  'uniqueVipAddr'   =>  1,          # 0: use same address, increment ports. 1: unique adresses, same port
   'vipPrefix'       =>  'vs',       # 
-  'vipPostfix'      =>  "",         # 
+  'vipPostfix'      =>  "_http",         # 
   'vipStart'        =>  1,          # 
-  'vipPort'         =>  443,        # 
   'vip_aNet'        =>  10,         # 
-  'vip_bNet'        =>  101,        # 
+  'vip_bNet'        =>  102,        # 
   'vip_cNet'        =>  11,         # 
   'vip_dNet'        =>  1,          # 
+  'vipPort'         =>  80,         # 
   'poolPrefix'      =>  'p',        # 
+  'poolPostfix'     =>  '_80',      # 
   'poolStart'       =>  1,          # 
   'poolMaxUsage'    =>  1,          # 
-  'poolMbrCount'    =>  4,          # 
-  'uniquePoolMbrs'  =>  2,          # 0: reuse original nodes, 1: never reuse nodes, 2: reuse nodes $nodeMaxUsage times
+  'poolMbrCount'    =>  8,          # 
+  'uniquePoolMbrs'  =>  0,          # 0: reuse original nodes, 1: never reuse nodes, 2: reuse nodes $nodeMaxUsage times
   'nodeMaxUsage'    =>  10,         # 
   'node_aNet'       =>  10,         # 
-  'node_bNet'       =>  102,        # 
-  'node_cNet'       =>  110,        # 
+  'node_bNet'       =>  104,        # 
+  'node_cNet'       =>  100,        # 
   'node_dNet'       =>  1,          # 
-  'nodePort'        =>  443,        # 
+  'nodePort'        =>  80,        # 
 };
 
 ##
@@ -99,12 +101,11 @@ my @pools;
 # This for loop controls the number of objects created in general,
 # not just vips
 for ( my $vipNum = 1; $vipNum <= $cfg->{'mkTotal'}; $vipNum++ ) {
-  $cur->{'vipName'} = sprintf("%s%05d%s", $cfg->{'vipPrefix'}, $cur->{'vipNum'}, $cfg->{'vipPostfix'});
-  $cur->{'vipAddr'} = sprintf("%d.%d.%d.%d:%d", $cfg->{'vip_aNet'},
-                                              $cfg->{'vip_bNet'},
-                                              $cfg->{'vip_cNet'},
-                                              $cfg->{'vip_dNet'},
-                                              $cfg->{'vipPort'});
+  $cur->{'vipName'} = sprintf("%s%03d%s", $cfg->{'vipPrefix'}, $cur->{'vipNum'}, $cfg->{'vipPostfix'});
+  $cur->{'vipAddr'} = sprintf("%d.%d.%d.%d", $cfg->{'vip_aNet'},
+                                             $cfg->{'vip_bNet'},
+                                             $cfg->{'vip_cNet'},
+                                             $cfg->{'vip_dNet'});
 
   # Don't use more than 250 address per /24
   if ( $cfg->{'uniqueVipAddr'} && $cfg->{'vip_dNet'} >= 250 ) {
@@ -123,7 +124,7 @@ for ( my $vipNum = 1; $vipNum <= $cfg->{'mkTotal'}; $vipNum++ ) {
 
   # Should the pool be reused or a new one created
   if ( ! $state->{'reusePool'} ) {
-    $cur->{'poolName'} = sprintf("%s%05d", $cfg->{'poolPrefix'}, $cur->{'poolNum'});
+    $cur->{'poolName'} = sprintf("%s%03d%s", $cfg->{'poolPrefix'}, $cur->{'poolNum'}, $cfg->{'poolPostfix'});
     $cur->{'poolNum'}++;
     $state->{'newPool'} = 1;
 
@@ -185,12 +186,14 @@ for ( my $vipNum = 1; $vipNum <= $cfg->{'mkTotal'}; $vipNum++ ) {
   }
 
 
-  my $vipCfgOpts = "profiles { fastL4 }";
-  my $vipCfg = sprintf("ltm virtual %s { destination %-19s pool %s %s }",
+  my $vipOpts     = "profiles { fastL4 } rules { snat_irule }";
+  #my $vipOpts     = "profiles { my2K { context clientside } my512bit_serverssl { context serverside } } rules { snat_irule }";
+  my $vipCfg      = sprintf("ltm virtual %s { destination %-s:%-7d pool %s %s }",
                     $cur->{'vipName'},
                     $cur->{'vipAddr'},
-                    $cur->{'poolName'}, $vipCfgOpts);
-
+                    $cfg->{'vipPort'},
+                    $cur->{'poolName'},
+                    $vipOpts);
   push(@vips, $vipCfg);
 
 
@@ -216,7 +219,9 @@ for ( my $vipNum = 1; $vipNum <= $cfg->{'mkTotal'}; $vipNum++ ) {
   #   1: never reuse pool members
   #   2: reuse pool members $cfg->{'poolMbrReuse'} times
   switch($cfg->{'uniquePoolMbrs'}) {
-    case 0  { }
+    case 0  {
+      $state->{'reuseNodes'} = 1;
+    }
     case 1  {
       undef @{$cur->{'nodes'}};
     }
@@ -235,9 +240,8 @@ for ( my $vipNum = 1; $vipNum <= $cfg->{'mkTotal'}; $vipNum++ ) {
 
 
 
-for my $p (@pools) { print "$p\n"; }
-print "\n";
-for my $v (@vips)  { print "$v\n"; }
+if ($cfg->{'printPools'}) { for my $p (@pools) { print "$p\n"; }; print "\n"; }
+if ($cfg->{'printVips'})  { for my $v (@vips)  { print "$v\n"; } }
 
 
 
