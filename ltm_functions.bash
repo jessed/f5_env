@@ -55,6 +55,9 @@ ltm_env() {
   # stop printing the motd on login
   ssh root@${host} "touch .hushlogin"
 
+  # bind 'ctrl+l to the bash 'clear-screen' command
+  ssh root@${host} "echo 'Control-l: clear-screen' > .inputrc"
+
 }
 
 # continually flash the screen after the given number of seconds has elapsed
