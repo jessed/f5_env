@@ -49,6 +49,9 @@ ltm_env() {
   #  don't change to the /config directory on login
   ssh root@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
 
+  # Run 'chk_vi_mode()' on login to set bash vi-mode
+  ssh root@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+
   # comment out the 'clear' in .bash_logout
   ssh root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
 
