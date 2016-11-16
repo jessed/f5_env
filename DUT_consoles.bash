@@ -1,11 +1,19 @@
 # ~/local/console_devices
 
+# bs4097, TD Bank - expires 20160803
+alias con-tc3900-1='telnet tc-con01      2023'
+
+# bs4304, VzW
+alias con-tc10350-1='telnet tc-con01  2024'
+
 alias con-tcvip06-1='telnet tc-con01   2001'
+alias con-tcvip06-2='telnet tc-con01   2002'
 alias con-tc2200-1='telnet tc-con01    2003'
 alias con-tc4200-1='telnet tc-con01    2004'
 alias con-tc5200-1='telnet tc-con01    2005'
 alias con-tc7200-1='telnet tc-con01    2006'
 alias con-tc10200-1='telnet tc-con01   2007'
+alias con-tc10800-1='telnet tc-con01   2014'
 alias con-tcvip04-1='telnet tc-con01   2008'
 alias con-tcvip04-2='telnet tc-con01   2009'
 alias con-tc6248-2='telnet tc-con02    2010'
@@ -30,6 +38,7 @@ alias con-tc4200-2='telnet tc-con02    2004'
 alias con-tc5200-2='telnet tc-con02    2005'
 alias con-tc7200-2='telnet tc-con02    2006'
 alias con-tc10200-2='telnet tc-con02   2007'
+alias con-tc10800-2='telnet tc-con02   2017'
 alias con-tcvip07-1='telnet tc-con02   2008'
 alias con-tcvip07-2='telnet tc-con02   2009'
 alias con-tc6248-1='telnet tc-con01    2010'
@@ -38,6 +47,7 @@ alias con-tc12250-2='telnet tc-con02   2012'
 alias con-tcvip09-1='telnet tc-con02   2013'
 alias con-tcvip05-3='telnet tc-con02   2014'
 alias con-tcvip09-2='telnet tc-con02   2015'
+alias con-tcvip07-3='telnet tc-con02   2016'
 
 alias con-a7048-1='telnet tc-con02     2031'
 alias con-a7508-2='telnet tc-con02     2032'
