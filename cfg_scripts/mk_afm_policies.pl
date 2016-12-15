@@ -4,33 +4,37 @@ use warnings;
 use strict;
 use Data::Dumper;
 
-my $numPolicy = 500;
-my $numRules  = 40;
+my $numPolicy = 1;
+my $numRules  = 700;
 #my $numRules  = 20000;
 #my $numPolicy = 1;
 
-my $aSrcNet  = 10;
-my $bSrcNet  = 102;
-my $cSrcNet  = 100;
-my $dSrcNet  = 0;
+my $aSrcNet  = 0;
+my $bSrcNet  = 0;
+my $cSrcNet  = 0;
+my $dSrcNet  = 1;
 
 my $aDstNet   = 10;
-my $bDstNet   = 101;
-my $cDstNet   = 11;
-my $dDstNet   = 1;
-my $dstPorts  = "80 443";
+my $bDstNet   = 111;
+my $cDstNet   = 0;
+my $dDstNet   = 0;
+my $dstPorts  = "80";
 
-my $perNetMax = 100;
+my $perNetMax = 1000;
 
 my $rule;
 
+printf("security firewall policy my_fw_policy {\n  rules {\n");
+
+# security firewall policy my_fw_policy { rules { r001 { action reject ip-protocol tcp destination { addresses { 10.111.0.0/16 { } } port { 8081 { } } } source { vlans { v114 }}}}}
 for ( my $count = 1; $count <= $numPolicy; $count++ ) {
-  my $port      = $count + 1024;
+  my $port      = $count + $dstPorts;
 
-  printf("security firewall policy afm_policy%03d {\n  rules {\n", $count);
+  #printf("security firewall policy my_fw_policy%03d {\n  rules {\n", $count);
 
-  for ( $rule = 1; $rule < $numRules; $rule++ ) {
-    printf("    r%02d { action drop ip-protocol tcp log yes destination { ports { %d { }}}}\n", $rule, $port);
+  for ( $rule = 1; $rule <= $numRules; $rule++ ) {
+    #printf("    r%03d { action reject ip-protocol tcp destination { port { %d { }}}}\n", $rule, $port);
+    printf("    r%03d { action reject ip-protocol tcp destination { addresses { 10.111.0.0/16 { }} ports { %d { }}} source { vlans { v114 }} }\n", $rule, $port);
     $port++;
   }
 
@@ -39,8 +43,9 @@ for ( my $count = 1; $count <= $numPolicy; $count++ ) {
     $cDstNet++;
   }
 
-  #printf("    r%02d { action accept ip-protocol tcp destination { addresses { %d.%d.%d.%d { }} ports { %s { }}}}\n  }\n}\n", $rule, $aDstNet, $bDstNet, $cDstNet, $dDstNet, $dstPorts);
-  printf("    r%02d { action accept ip-protocol tcp log yes destination { ports { %s { }}}}\n  }\n}\n", $rule, $dstPorts);
+  #printf("    r%02d { action accept ip-protocol tcp destination { addresses { %d.%d.%d.%d { }} port { %s { }}}}\n  }\n}\n", $rule, $aDstNet, $bDstNet, $cDstNet, $dDstNet, $dstPorts);
 
-  $dDstNet++;
+  #$dDstNet++;
 }
+  #printf("    r%03d { action accept ip-protocol tcp destination { port { %s { }}}}\n  }\n}\n", $rule, $dstPorts);
+  printf("    r%03d { action accept ip-protocol tcp destination { addresses { 10.111.0.0/16 { }} ports { %s { }}} source { vlans { v114 }}}\n  }\n}\n", $rule, $dstPorts);
