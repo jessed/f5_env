@@ -62,8 +62,8 @@ ltm_env() {
   ssh root@${host} "echo 'Control-l: clear-screen' > .inputrc"
 
   # update sshd_config to accept the $VIMODE environment variable from clients
-  ssh root@${host} "echo 'AcceptEnv  VIMODE' >> /config/ssh/sshd_config"
-  ssh root@${host} "/etc/init.d/sshd restart"
+  #ssh root@${host} "echo 'AcceptEnv  VIMODE' >> /config/ssh/sshd_config"
+  #ssh root@${host} "/etc/init.d/sshd restart"
 
 }
 
