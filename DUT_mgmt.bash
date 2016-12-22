@@ -1,18 +1,21 @@
 # ~/local/devices
 
-alias work='ssh workdsk.olympus.f5net.com'
-
+###
+### Seattle Performance test
+###
 
 ## 4304, VzW
 alias tc10350-1='ssh root@tc10350-1'
 
+## vCMP v6 management testing (VzW, Haitao)
+alias client01='ssh jessed@client01'
+alias server01='ssh jessed@server01'
 
 ##VE/VMs
-#alias ve01='ssh root@ve01'
-#alias ve02='ssh root@ve02'
-#alias ve03='ssh root@ve03'
-#alias ve04='ssh root@ve04'
-
+alias ve01='ssh root@ve01'
+alias ve02='ssh root@ve02'
+alias ve03='ssh root@ve03'
+alias ve04='ssh root@ve04'
 
 # vCMP guests
 alias vcmp01='ssh  root@vcmp01'
@@ -34,38 +37,16 @@ alias vcmp02b='ssh root@vcmp02b'
 alias vcmp03b='ssh root@vcmp03b'
 alias vcmp04b='ssh root@vcmp04b'
 
-
-## London
-alias a1='ssh root@172.30.107.136'
-alias b1='ssh root@172.30.107.138'
-alias a1-3hassis='ssh root@172.30.107.130'
-alias b1-3hassis='ssh root@172.30.107.40'
-alias uktest='ssh root@172.30.107.135'
-
-#alias linux02='ssh jessed@172.27.60.10'
-alias a7048='ssh jessed@a7048'        # Arista admin switch
-alias a7508='ssh jessed@a7508'        # core switch, > 40Gbs devices
-alias a7508-1='ssh jessed@a7508-1'    # core switch, > 40Gbs devices
-alias a7508-2='ssh jessed@a7508-2'    # core switch, > 40Gbs devices
-alias tc6248-1='telnet tc6248-1'      # mgmt switch
-alias tc6248-2='telnet tc6248-2'      # mgmt switch
-
-
-## TC servers / mgmt
-alias tcsrv01='ssh jessed@tcsrv01'    # General purpose linux workstation
-alias tcsrv03='ssh jessed@tcsrv01'    # General purpose linux workstation
-
 ## TC Hypervisors
 # VMware user/pass: root / ihtfcp,sswa  ( vcenter: administrator@pl.itc / FuckY0u! )
-alias tcvcenter='ssh tcvcenter'       # vCenter server
-alias tchv01='ssh tchv01'             # Hypervisor
-alias tchv02='ssh tchv02'             # Hypervisor
-alias tchv03='ssh tchv03'             # Hypervisor
-alias tchv04='ssh tchv04'             # Hypervisor
+alias tchv01='ssh tchv01'             # Hypervisor, VMware
+alias tchv02='ssh tchv02'             # Hypervisor, VMware
+alias tchv03='ssh tchv03'             # Hypervisor, KVM
+alias tchv04='ssh tchv04'             # Hypervisor, KVM
 
 ## Ixia chassis and appliance ports
-alias tcixc01='telnet tcixc01 8021'
-alias tcixc02='telnet tcixc02 8021'
+alias tcixc01='telnet tcixc01 8021'           # XGS-12; may no longer be valid after upgrade to native linux IxServer
+alias tcixc02='telnet tcixc02 8021'           # XM-12
 alias tcixa01-1='telnet -l root tcixa01-1'    # appliance root password: 1x1ac0m.c0m
 alias tcixa01-2='telnet -l root tcixa01-2'
 alias tcixa01-3='telnet -l root tcixa01-3'
@@ -96,7 +77,7 @@ alias tcixa07-3='telnet -l root tcixa07-3'
 alias tcixa07-4='telnet -l root tcixa07-4'
 
 
-## TC DUTs
+## VIPRION chassis and slots
 alias tcvip01='ssh   -t root@tcvip01'     # 2400
 alias tcvip01-1='ssh -t root@tcvip01-1'
 alias tcvip01-2='ssh -t root@tcvip01-2'
@@ -139,7 +120,7 @@ alias tcvip09='ssh   -t root@tcvip09'     # 4800
 alias tcvip09-1='ssh -t root@tcvip09-1'
 alias tcvip09-2='ssh -t root@tcvip09-2'
 
-# Current platforms (appliances)
+# Appliances
 alias tc2200-1='ssh -t tc2200-1'
 alias tc2200-2='ssh -t tc2200-2'
 alias tc4200-1='ssh -t tc4200-1'
@@ -150,28 +131,59 @@ alias tc7200-1='ssh -t tc7200-1'
 alias tc7200-2='ssh -t tc7200-2'
 alias tc10200-1='ssh -t tc10200-1'
 alias tc10200-2='ssh -t tc10200-2'
-alias tc10350-1='ssh -t tc10350-1'
 alias tc10800-1='ssh -t tc10800-1'
 alias tc10800-2='ssh -t tc10800-2'
-
 alias tc12250-1='ssh -t tc12250-1'
 alias tc12250-2='ssh -t tc12250-2'
-
-# older platforms (appliances)
 alias tc11050-1='ssh -t tc11050-1'
-alias tc8950-1='ssh  -t tc8950-1'
-alias tc8950s-1='ssh -t tc8950s-1'
-alias tc8900-1='ssh  -t tc8900-1'
-alias tc8900-2='ssh  -t tc8900-2'
-alias tc8800-1='ssh  -t tc8800-1'
-alias tc6400-1='ssh  -t tc6400-1'
-alias tc6800-1='ssh  -t tc6800-1'
-alias tc6900-1='ssh  -t tc6900-1'
-alias tc3900-1='ssh  -t tc3900-1'
-alias tc3600-1='ssh  -t tc3600-1'
-alias tc1600-1='ssh  -t tc1600-1'
 
-# default VE addresses (for those rare instances when VE is requested)
-#alias tcve01='ssh -t root@tcve01'
-#alias tcve02='ssh -t root@tcve02'
+# Infrastructure systems / Hypervisors
+alias tcsrv01='ssh tcsrv01'           # General purpose linux workstation
+alias a7048='ssh a7048'               # Arista admin/test switch
+alias a7508='ssh a7508'               # core switch, > 40Gbs devices
+alias a7508-1='ssh a7508-1'           # core switch, > 40Gbs devices
+alias a7508-2='ssh a7508-2'           # core switch, > 40Gbs devices
+alias tc6248-1='telnet tc6248-1'      # mgmt switch
+alias tc6248-2='telnet tc6248-2'      # mgmt switch
+
+# VMware user/pass: root / ihtfcp,sswa  ( vcenter: administrator@pl.itc / FuckY0u! )
+alias tchv01='ssh tchv01'             # Hypervisor, VMware  - root / ihtfcp,sswa
+alias tchv02='ssh tchv02'             # Hypervisor, VMware  - root / ihtfcp,sswa
+alias tchv03='ssh tchv03'             # Hypervisor, KVM
+alias tchv04='ssh tchv04'             # Hypervisor, KVM
+
+
+###
+### Seattle PoC/Demo
+###
+## demo VMs
+alias sea-analytics='ssh -t root@sea-analytics'
+alias sea-bind-1='ssh user@sea-bind-1'
+alias sea-dns-1='ssh root@sea-dns-1'
+
+## demo DUTs
+alias sea-c2200-1='ssh -t root@sea-c2200-1'
+alias sea-c2400-1='ssh -t root@sea-c2400-1'
+alias sea-c4400-1='ssh -t root@sea-c4400-1'
+alias sea-2200s-1='ssh -t root@sea-2200s-1'
+alias sea-2200s-2='ssh -t root@sea-2200s-2'
+alias sea-10200v-1='ssh -t root@sea-10200v-1'
+alias sea-10200v-2='ssh -t root@sea-10200v-2'
+alias sea-12250v-1='ssh -t root@sea-12250v-1'
+
+## demo switches and servers
+alias sea-sw-13t='ssh admin@sea-sw-13t'
+alias cs='ssh itc@sea-cs-a14.itc.f5net.com'
+alias sea-tcsrv-1='ssh sea-tcsrv-1'
+alias sea-tcsrv-2='ssh sea-tcsrv-2'
+
+
+###
+### London
+###
+alias a1='ssh root@172.30.107.136'
+alias b1='ssh root@172.30.107.138'
+alias a1-3hassis='ssh root@172.30.107.130'
+alias b1-3hassis='ssh root@172.30.107.40'
+alias uktest='ssh root@172.30.107.135'
 

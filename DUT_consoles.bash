@@ -1,5 +1,9 @@
 # ~/local/console_devices
 
+###
+### Seattle Performance
+###
+
 # bs4097, TD Bank - expires 20160803
 alias con-tc3900-1='telnet tc-con01      2023'
 
@@ -27,9 +31,6 @@ alias con-tcvip02-1='telnet tc-con01   2027'
 alias con-tcvip02-2='telnet tc-con01   2028'
 alias con-tcvip03-1='telnet tc-con01   2029'
 alias con-tcvip03-2='telnet tc-con01   2030'
-alias con-a7508-1='telnet tc-con01     2032'
-
-
 
 alias con-tcvip05-1='telnet tc-con02   2001'
 alias con-tcvip05-2='telnet tc-con02   2002'
@@ -49,6 +50,22 @@ alias con-tcvip05-3='telnet tc-con02   2014'
 alias con-tcvip09-2='telnet tc-con02   2015'
 alias con-tcvip07-3='telnet tc-con02   2016'
 
-alias con-a7048-1='telnet tc-con02     2031'
-alias con-a7508-2='telnet tc-con02     2032'
+alias con-a7048-1='telnet tc-con02     2031'    # Arista 7048
+alias con-a7508-1='telnet tc-con01     2032'    # Arista 7508, sup 1
+alias con-a7508-2='telnet tc-con02     2032'    # Arista 7508, sup 2
 
+###
+### Seattle Poc/Demo
+###
+alias con-sea-c4400-1-1='ssh itc@sea-cs-a14.itc.f5net.com -p 3001'
+alias con-sea-c4400-1-2='ssh itc@sea-cs-a14.itc.f5net.com -p 3002'
+alias con-sea-12250v-1='ssh itc@sea-cs-a14.itc.f5net.com  -p 3003'
+alias con-sea-10200v-1='ssh itc@sea-cs-a14.itc.f5net.com  -p 3004'
+alias con-sea-10200v-2='ssh itc@sea-cs-a14.itc.f5net.com  -p 3005'
+alias con-sea-2200s-1='ssh itc@sea-cs-a14.itc.f5net.com   -p 3006'
+alias con-sea-2200s-2='ssh itc@sea-cs-a14.itc.f5net.com   -p 3007'
+alias con-sea-c2200-1-1='ssh itc@sea-cs-a14.itc.f5net.com -p 3008'
+alias con-sea-c2400-1-3='ssh itc@sea-cs-a14.itc.f5net.com -p 3009'
+alias con-sea-c2400-1-1='ssh itc@sea-cs-a14.itc.f5net.com -p 3010'
+alias con-sea-c2400-1-2='ssh itc@sea-cs-a14.itc.f5net.com -p 3011'
+alias con-sea-sw-13t='ssh itc@sea-cs-a14.itc.f5net.com    -p 3032'
