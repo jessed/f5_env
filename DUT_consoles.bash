@@ -4,11 +4,7 @@
 ### Seattle Performance
 ###
 
-# bs4097, TD Bank - expires 20160803
-alias con-tc3900-1='telnet tc-con01      2023'
 
-# bs4304, VzW
-alias con-tc10350-1='telnet tc-con01  2024'
 
 alias con-tcvip06-1='telnet tc-con01   2001'
 alias con-tcvip06-2='telnet tc-con01   2002'
@@ -24,6 +20,7 @@ alias con-tc6248-2='telnet tc-con02    2010'
 alias con-tc12250-1='telnet tc-con01   2011'
 alias con-tcvip08-1='telnet tc-con01   2012'
 alias con-tcvip08-2='telnet tc-con01   2013'
+alias con-tc3900-1='telnet tc-con01    2023'
 
 alias con-tcvip01-1='telnet tc-con01   2025'
 alias con-tcvip01-2='telnet tc-con01   2026'

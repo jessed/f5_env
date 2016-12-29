@@ -4,9 +4,6 @@
 ### Seattle Performance test
 ###
 
-## 4304, VzW
-alias tc10350-1='ssh root@tc10350-1'
-
 ## vCMP v6 management testing (VzW, Haitao)
 alias client01='ssh jessed@client01'
 alias server01='ssh jessed@server01'
