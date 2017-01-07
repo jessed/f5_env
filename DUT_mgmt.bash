@@ -4,9 +4,8 @@
 ### Seattle Performance test
 ###
 
-## vCMP v6 management testing (VzW, Haitao)
-alias client01='ssh jessed@client01'
-alias server01='ssh jessed@server01'
+## BS4318
+alias bs4318-ldap='ssh jessed@bs4318-ldap'
 
 ##VE/VMs
 alias ve01='ssh root@ve01'
