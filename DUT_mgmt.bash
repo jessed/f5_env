@@ -4,10 +4,6 @@
 ### Seattle Performance test
 ###
 
-## BS4318
-alias bs4318-ldap='ssh jessed@bs4318-ldap'
-alias client-bs4318='ssh jessed@client-bs4318'
-
 ##VE/VMs
 alias ve01='ssh root@ve01'
 alias ve02='ssh root@ve02'
