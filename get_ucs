@@ -1,0 +1,24 @@
+#! /bin/bash
+
+usage() {
+  echo "USAGE: $0 <engagement_id> <host> [purpose]"
+  exit 1
+}
+
+now=$(date +%Y%m%d)
+
+if [[ -z $1 ]]; then usage; else id=$1; fi
+if [[ -z $2 ]]; then usage; else host=$2; fi
+if [[ -n $3 ]]; then purpose=$3; else purpose=""; fi
+
+if [[ -n $3 ]]; then
+  ucsName="${host}-${purpose}-${now}.ucs";
+else
+  ucsName="${host}-${now}.ucs"
+fi
+
+
+ssh $host tmsh save sys ucs /shared/tmp/${id}/${ucsName}
+
+scp $host:/shared/tmp/${id}/${ucsName} .
+
