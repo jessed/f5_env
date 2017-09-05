@@ -15,6 +15,9 @@ set smartindent
 " don't move comments to the first column (irritating as hell)
 inoremap # X#
 
+" Map F1 to escape when in insert mode.
+inoremap <F1> <Esc>
+
 set showmatch
 set incsearch
 set hlsearch

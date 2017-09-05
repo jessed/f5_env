@@ -38,7 +38,7 @@ alias tchv03='ssh tchv03'             # Hypervisor, KVM
 alias tchv04='ssh tchv04'             # Hypervisor, KVM
 
 ## Ixia chassis and appliance ports
-alias tcixc01='telnet tcixc01 8021'           # XGS-12; may no longer be valid after upgrade to native linux IxServer
+alias tcixc01='ssh -p 8022 admin@tcixc01'     # XGS-12    admin / admin  (SSH and FTP)
 alias tcixc02='telnet tcixc02 8021'           # XM-12
 alias tcixa01-1='telnet -l root tcixa01-1'    # appliance root password: 1x1ac0m.c0m
 alias tcixa01-2='telnet -l root tcixa01-2'
@@ -124,6 +124,9 @@ alias tc7200-1='ssh -t tc7200-1'
 alias tc7200-2='ssh -t tc7200-2'
 alias tc10200-1='ssh -t tc10200-1'
 alias tc10200-2='ssh -t tc10200-2'
+
+
+alias tc5800-1='ssh -t tc5800-1'
 alias tc10800-1='ssh -t tc10800-1'
 alias tc10800-2='ssh -t tc10800-2'
 alias tc12250-1='ssh -t tc12250-1'
