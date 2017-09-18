@@ -37,6 +37,12 @@ alias tchv02='ssh tchv02'             # Hypervisor, VMware
 alias tchv03='ssh tchv03'             # Hypervisor, KVM
 alias tchv04='ssh tchv04'             # Hypervisor, KVM
 
+## Oslo Servers
+alias tcoslo01='ssh tcoslo01'
+alias tcoslo02='ssh tcoslo02'
+alias tcoslo03='ssh tcoslo03'
+
+
 ## Ixia chassis and appliance ports
 alias tcixc01='ssh -p 8022 admin@tcixc01'     # XGS-12    admin / admin  (SSH and FTP)
 alias tcixc02='telnet tcixc02 8021'           # XM-12
