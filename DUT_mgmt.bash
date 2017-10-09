@@ -133,6 +133,7 @@ alias tc10200-2='ssh -t tc10200-2'
 
 
 alias tc5800-1='ssh -t tc5800-1'
+alias tc5800-2='ssh -t tc5800-2'
 alias tc10800-1='ssh -t tc10800-1'
 alias tc10800-2='ssh -t tc10800-2'
 alias tc12250-1='ssh -t tc12250-1'
