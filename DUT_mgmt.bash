@@ -4,6 +4,11 @@
 ### Seattle Performance test
 ###
 
+
+## bs4970, BT
+alias tc2800-1='ssh root@tc2800-1'
+alias tc2800-2='ssh root@tc2800-2'
+
 ##VE/VMs
 alias ve01='ssh root@ve01'
 alias ve02='ssh root@ve02'
