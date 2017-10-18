@@ -36,7 +36,7 @@
 
 
 # ITC workstations
-172.22.57.250   win2008gold
+172.22.57.250   win2010gold
 172.22.57.223   j1-itc j1
 172.22.57.224   j2-itc j2
 172.22.57.225   j3-itc j3
