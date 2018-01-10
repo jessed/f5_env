@@ -4,10 +4,18 @@
 ### Seattle Performance test
 ###
 
+## Orange PL
+alias bs4986-pcrf='ssh root@bs4986-pcrf'
 
-## bs4970, BT
-alias tc2800-1='ssh root@tc2800-1'
-alias tc2800-2='ssh root@tc2800-2'
+
+## bs5151, Sberbank
+alias s01-bs5151='ssh root@s01-bs5151'
+alias s02-bs5151='ssh root@s02-bs5151'
+alias s03-bs5151='ssh root@s03-bs5151'
+alias guest01='ssh root@guest01'
+alias guest02='ssh root@guest02'
+alias guest03='ssh root@guest03'
+alias guest04='ssh root@guest04'
 
 ##VE/VMs
 alias ve01='ssh root@ve01'
@@ -139,6 +147,7 @@ alias tc10200-2='ssh -t tc10200-2'
 
 alias tc5800-1='ssh -t tc5800-1'
 alias tc5800-2='ssh -t tc5800-2'
+alias tc7800-1='ssh -t tc7800-1'
 alias tc10800-1='ssh -t tc10800-1'
 alias tc10800-2='ssh -t tc10800-2'
 alias tc12250-1='ssh -t tc12250-1'
