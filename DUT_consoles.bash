@@ -5,6 +5,8 @@
 ###
 
 
+alias con-tc5250-1='telnet tc-con01    2017'    # bs5126, BBVA
+alias con-tc4600-1='telnet tc-con01    2018'    # bs5126, BBVA
 
 alias con-tcvip06-1='telnet tc-con01   2001'
 alias con-tcvip06-2='telnet tc-con01   2002'

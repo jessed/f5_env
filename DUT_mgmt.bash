@@ -8,14 +8,9 @@
 alias bs4986-pcrf='ssh root@bs4986-pcrf'
 
 
-## bs5151, Sberbank
-alias s01-bs5151='ssh root@s01-bs5151'
-alias s02-bs5151='ssh root@s02-bs5151'
-alias s03-bs5151='ssh root@s03-bs5151'
-alias guest01='ssh root@guest01'
-alias guest02='ssh root@guest02'
-alias guest03='ssh root@guest03'
-alias guest04='ssh root@guest04'
+## bs5126, BBVA
+alias tc4600-1='ssh root@tc4600-1'
+alias tc5250-1='ssh root@tc5250-1'
 
 ##VE/VMs
 alias ve01='ssh root@ve01'
