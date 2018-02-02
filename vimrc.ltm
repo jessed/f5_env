@@ -1,5 +1,6 @@
 " LTM-compatible .vimrc
 
+syntax on
 set nocompatible
 set shiftwidth=2
 set softtabstop=2
@@ -38,5 +39,5 @@ set t_kb=
 " Clear search highlighting after the search
 map <C-X> :let @/=""<CR>
 
-syntax on
 
+map @c='v%:join€kd'

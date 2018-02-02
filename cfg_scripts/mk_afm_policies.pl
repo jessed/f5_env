@@ -5,7 +5,7 @@ use strict;
 use Data::Dumper;
 
 my $numPolicy = 1;
-my $numRules  = 250;
+my $numRules  = 700;
 #my $numRules  = 20000;
 #my $numPolicy = 1;
 
@@ -19,7 +19,7 @@ my $aDstNet   = 10;
 my $bDstNet   = 108;
 my $cDstNet   = 0;
 my $dDstNet   = 0;
-my $dstPorts  = "80";
+my $dstPorts  = "1024";
 my $dstVlans  = "v108";
 
 my $perNetMax = 1000;
