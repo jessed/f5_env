@@ -40,4 +40,4 @@ set t_kb=
 map <C-X> :let @/=""<CR>
 
 
-map @c='v%:join€kd'
+let @c='v%:join€kd'

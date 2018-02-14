@@ -4,13 +4,32 @@
 ### Seattle Performance test
 ###
 
+## BS5299, Telefonica Chile
+alias vcmp01='ssh root@bs5299-vcmp01'
+alias vcmp02='ssh root@bs5299-vcmp02'
+alias vcmp03='ssh root@bs5299-vcmp03'
+alias vcmp04='ssh root@bs5299-vcmp04'
+alias vcmp05='ssh root@bs5299-vcmp05'
+alias vcmp06='ssh root@bs5299-vcmp06'
+alias vcmp07='ssh root@bs5299-vcmp07'
+alias vcmp08='ssh root@bs5299-vcmp08'
+alias vcmp09='ssh root@bs5299-vcmp09'
+alias vcmp10='ssh root@bs5299-vcmp10'
+alias vcmp11='ssh root@bs5299-vcmp11'
+alias vcmp12='ssh root@bs5299-vcmp12'
+alias vcmp13='ssh root@bs5299-vcmp13'
+alias vcmp14='ssh root@bs5299-vcmp14'
+alias vcmp15='ssh root@bs5299-vcmp15'
+alias vcmp16='ssh root@bs5299-vcmp16'
+alias vcmp17='ssh root@bs5299-vcmp17'
+alias vcmp18='ssh root@bs5299-vcmp18'
+alias vcmp19='ssh root@bs5299-vcmp19'
+alias vcmp20='ssh root@bs5299-vcmp20'
+
+
 ## Orange PL
 alias bs4986-pcrf='ssh root@bs4986-pcrf'
 
-
-## bs5126, BBVA
-alias tc4600-1='ssh root@tc4600-1'
-alias tc5250-1='ssh root@tc5250-1'
 
 ##VE/VMs
 alias ve01='ssh root@ve01'
