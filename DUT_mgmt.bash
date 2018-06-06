@@ -4,17 +4,6 @@
 ### Seattle Performance test
 ###
 
-## BS5326, China Mobile
-alias bs5326-vcmp01='ssh root@bs5326-vcmp01'
-alias bs5326-vcmp02='ssh root@bs5326-vcmp02'
-alias bs5326-vcmp03='ssh root@bs5326-vcmp03'
-alias bs5326-vcmp04='ssh root@bs5326-vcmp04'
-alias bs5326-vcmp05='ssh root@bs5326-vcmp05'
-alias bs5326-vcmp06='ssh root@bs5326-vcmp06'
-alias bs5326-vcmp07='ssh root@bs5326-vcmp07'
-alias bs5326-vcmp08='ssh root@bs5326-vcmp08'
-
-
 ## Orange PL
 alias bs4986-pcrf='ssh root@bs4986-pcrf'
 
@@ -24,6 +13,10 @@ alias ve01='ssh root@ve01'
 alias ve02='ssh root@ve02'
 alias ve03='ssh root@ve03'
 alias ve04='ssh root@ve04'
+alias ve05='ssh root@ve05'
+alias ve06='ssh root@ve06'
+alias ve07='ssh root@ve07'
+alias ve08='ssh root@ve08'
 
 # vCMP guests
 alias vcmp01='ssh  root@vcmp01'

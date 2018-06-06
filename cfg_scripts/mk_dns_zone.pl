@@ -4,12 +4,12 @@ use warnings;
 use strict;
 
 
-my $zone		= "amazon.com";
+my $zone		= "j.amazon.com";
 
-my $count   = 5000;
+my $count   = 100000;
 
-my $aNet    = 3;
-my $bNet    = 10;
+my $aNet    = 4;
+my $bNet    = 30;
 my $cNet    = 1;
 my $dNet    = 1;
 
@@ -23,7 +23,7 @@ for ( my $c = 1; $c <= $count; $c++ ) {
   if ( $dNet > 250 ) { $dNet = 1; $cNet++; }
   if ( $cNet > 250 ) { $dNet = 1; $cNet = 1; $bNet++ }
 
-  my $host  = sprintf("host%05d\t\tA\t%d.%d.%d.%d\n", $c, $aNet, $bNet, $cNet, $dNet);
+  my $host  = sprintf("host%07d\t\tA\t%d.%d.%d.%d\n", $c, $aNet, $bNet, $cNet, $dNet);
 
   push(@records, $host);
   $dNet++;
@@ -46,8 +46,11 @@ $zone		IN SOA	ns1.$zone. root.$zone. (
 				   10      ; minimum (10 seconds)
 				)
 			NS	ns1.$zone.
-ns1		A	10.111.101.10
+
 \$ORIGIN $zone.
+
+
+ns1		A	10.111.101.10
 ";
 
 	print "$ZONE_HDR\n\n";
