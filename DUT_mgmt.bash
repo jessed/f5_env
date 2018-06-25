@@ -4,6 +4,15 @@
 ### Seattle Performance test
 ###
 
+## BS5640, IBM
+alias bs5640-ve01='ssh root@ve01'
+alias bs5640-ve02='ssh -p 2022 bs5640-ve02'
+alias bs5640-ve03='ssh -p 3022 bs5640-ve03'
+alias bs5640-ve04='ssh -p 4022 bs5640-ve04'
+alias bs5640-ve05='ssh -p 5022 bs5640-ve05'
+alias bs5640-ve06='ssh -p 6022 bs5640-ve06'
+
+
 ## Orange PL
 alias bs4986-pcrf='ssh root@bs4986-pcrf'
 
