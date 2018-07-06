@@ -7,6 +7,8 @@
 ## Orange PL
 alias bs4986-pcrf='ssh root@bs4986-pcrf'
 
+## bs5628, Telstra
+alias bs5628='ssh bs5628'
 
 ##VE/VMs
 alias ve01='ssh root@ve01'
