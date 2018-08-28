@@ -51,6 +51,9 @@ alias tchv04='ssh tchv04'             # Hypervisor, KVM
 alias tcoslo01='ssh tcoslo01'
 alias tcoslo02='ssh tcoslo02'
 alias tcoslo03='ssh tcoslo03'
+alias tcoslo04='ssh tcoslo04'
+alias tcoslo05='ssh tcoslo05'
+alias tcoslo06='ssh tcoslo06'
 
 
 ## Ixia chassis and appliance ports

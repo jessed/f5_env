@@ -64,8 +64,49 @@ ltm_env() {
   # update sshd_config to accept the $VIMODE environment variable from clients
   #ssh root@${host} "echo 'AcceptEnv  VIMODE' >> /config/ssh/sshd_config"
   #ssh root@${host} "/etc/init.d/sshd restart"
-
 }
+
+# Perform initial environment customization for AWS instances
+aws_env() {
+  local ENVFILE="${HOME}/ltm_helpers/env.ltm"
+  local VIMRC="${HOME}/ltm_helpers/vimrc.ltm"
+
+  if [[ -n "$1" ]]; then
+    host=$1
+  else
+    echo "USAGE: ltm_env <ltm_host>"
+    return
+  fi
+
+	# First step: change admin user shell to bash (from tmsh)
+	ssh admin@${host} "modify auth user admin shell bash; save sys config"
+
+  # copy the new environment file into place
+  scp ${ENVFILE} admin@${host}:/shared/env.ltm
+  scp ${VIMRC}   admin@${host}:/shared/vimrc.ltm
+  ssh admin@${host} "ln -sf /shared/env.ltm .env.ltm"
+  ssh admin@${host} "ln -sf /shared/vimrc.ltm .vimrc"
+
+  # update existing .bash_profile to source new environment file
+  ssh admin@${host} "echo \"alias src='source /shared/env.ltm'\">> .bash_profile"
+  ssh admin@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
+
+  #  don't change to the /config directory on login
+  ssh admin@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
+
+  # Run 'chk_vi_mode()' on login to set bash vi-mode
+  ssh admin@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+
+  # comment out the 'clear' in .bash_logout
+  ssh admin@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
+
+  # stop printing the motd on login
+  #ssh admin@${host} "touch .hushlogin"
+
+  # bind 'ctrl+l to the bash 'clear-screen' command
+  ssh admin@${host} "echo 'Control-l: clear-screen' > .inputrc"
+}
+
 
 # continually flash the screen after the given number of seconds has elapsed
 reminder() {
