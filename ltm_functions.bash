@@ -26,85 +26,122 @@ synckey() {
 # command, which sources the ~/.env.ltm
 # SYNTAX:  ltm_env <host>
 ltm_env() {
-  local ENVFILE="${HOME}/ltm_helpers/env.ltm"
-  local VIMRC="${HOME}/ltm_helpers/vimrc.ltm"
+  local ENVFILE="${HOME}/ltm_helpers/env_files/env.ltm"
+  local VIMRC="${HOME}/ltm_helpers/env_files/vimrc.ltm"
 
   if [[ -n "$1" ]]; then
     host=$1
   else
-    echo "USAGE: ltm_env <ltm_host>"
+    echo "USAGE: ltm_env <ltm_host> [port]"
     return
   fi
 
+  if [[ -n "$2" ]]; then
+    port=$2
+  else
+    port=22
+  fi
+
   # copy the new environment file into place
-  scp ${ENVFILE} root@${host}:/shared/env.ltm
-  scp ${VIMRC}   root@${host}:/shared/vimrc.ltm
-  ssh root@${host} "ln -sf /shared/env.ltm .env.ltm"
-  ssh root@${host} "ln -sf /shared/vimrc.ltm .vimrc"
+  scp -P ${port} ${ENVFILE} root@${host}:/shared/env.ltm
+  scp -P ${port} ${VIMRC}   root@${host}:/shared/vimrc.ltm
+  ssh -p ${port} root@${host} "ln -sf /shared/env.ltm .env.ltm"
+  ssh -p ${port} root@${host} "ln -sf /shared/vimrc.ltm .vimrc"
 
   # update existing .bash_profile to source new environment file
-  ssh root@${host} "echo \"alias src='cd ; source /shared/env.ltm'\">> .bash_profile"
-  ssh root@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
+  ssh -p ${port} root@${host} "echo \"alias src='cd ; source /shared/env.ltm'\">> .bash_profile"
+  ssh -p ${port} root@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
 
   #  don't change to the /config directory on login
-  ssh root@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
+  ssh -p ${port} root@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
 
   # Run 'chk_vi_mode()' on login to set bash vi-mode
-  ssh root@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+  ssh -p ${port} root@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
 
   # comment out the 'clear' in .bash_logout
-  ssh root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
+  ssh -p ${port} root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
 
   # stop printing the motd on login
-  ssh root@${host} "touch .hushlogin"
+  ssh -p ${port} root@${host} "touch .hushlogin"
 
   # bind 'ctrl+l to the bash 'clear-screen' command
-  ssh root@${host} "echo 'Control-l: clear-screen' > .inputrc"
+  ssh -p ${port} root@${host} "echo 'Control-l: clear-screen' > .inputrc"
 
-  # update sshd_config to accept the $VIMODE environment variable from clients
-  #ssh root@${host} "echo 'AcceptEnv  VIMODE' >> /config/ssh/sshd_config"
-  #ssh root@${host} "/etc/init.d/sshd restart"
 }
 
 # Perform initial environment customization for AWS instances
 aws_env() {
-  local ENVFILE="${HOME}/ltm_helpers/env.ltm"
-  local VIMRC="${HOME}/ltm_helpers/vimrc.ltm"
+  local ENVFILE="${HOME}/ltm_helpers/env_files/env.ltm"
+  local VIMRC="${HOME}/ltm_helpers/env_files/vimrc.ltm"
 
   if [[ -n "$1" ]]; then
     host=$1
   else
-    echo "USAGE: ltm_env <ltm_host>"
+    echo "USAGE: ltm_env <ltm_host> [port]"
     return
+  fi
+  if [[ -n "$2" ]]; then
+    port=$2
+  else
+    port=22
   fi
 
 	# First step: change admin user shell to bash (from tmsh)
-	ssh admin@${host} "modify auth user admin shell bash; save sys config"
+	ssh -p ${port} admin@${host} "modify auth user admin shell bash; save sys config"
 
   # copy the new environment file into place
-  scp ${ENVFILE} admin@${host}:/shared/env.ltm
-  scp ${VIMRC}   admin@${host}:/shared/vimrc.ltm
-  ssh admin@${host} "ln -sf /shared/env.ltm .env.ltm"
-  ssh admin@${host} "ln -sf /shared/vimrc.ltm .vimrc"
+  scp -P ${port} ${ENVFILE} admin@${host}:/shared/env.ltm
+  scp -P ${port} ${VIMRC}   admin@${host}:/shared/vimrc.ltm
+  ssh -p ${port} admin@${host} "ln -sf /shared/env.ltm .env.ltm"
+  ssh -p ${port} admin@${host} "ln -sf /shared/vimrc.ltm .vimrc"
 
   # update existing .bash_profile to source new environment file
-  ssh admin@${host} "echo \"alias src='source /shared/env.ltm'\">> .bash_profile"
-  ssh admin@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
+  ssh -p ${port} admin@${host} "echo \"alias src='source /shared/env.ltm'\">> .bash_profile"
+  ssh -p ${port} admin@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
 
   #  don't change to the /config directory on login
-  ssh admin@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
+  ssh -p ${port} admin@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
 
   # Run 'chk_vi_mode()' on login to set bash vi-mode
-  ssh admin@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+  ssh -p ${port} admin@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
 
   # comment out the 'clear' in .bash_logout
-  ssh admin@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
+  ssh -p ${port} admin@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
 
   # stop printing the motd on login
   #ssh admin@${host} "touch .hushlogin"
 
   # bind 'ctrl+l to the bash 'clear-screen' command
-  ssh admin@${host} "echo 'Control-l: clear-screen' > .inputrc"
+  ssh -p ${port} admin@${host} "echo 'Control-l: clear-screen' > .inputrc"
+}
+
+
+## Update AWS linux host environment
+aws_linux() {
+  if [[ -z "$1" ]]; then
+    echo "USAGE: aws_linux {aws_host} [port] (default: 22)"
+    return
+  else
+    host=$1
+  fi
+
+  if [[ -n "$2" ]]; then
+    port=$2
+  else
+    port=22
+  fi
+
+  files=$(ls ${HOME}/ltm_helpers/env_files/dot*)
+
+  for f in $files; do
+    new=$(basename $f | sed 's/dot//')
+    #echo scp -P ${port} $f ${host}:${new}
+    scp -P ${port} $f ${host}:${new}
+  done
+
+  # copy an updated sudoers file  
+  scp -P ${port} sudoers ${host}:
+
 }
 
 

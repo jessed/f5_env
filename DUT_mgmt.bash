@@ -4,11 +4,9 @@
 ### Seattle Performance test
 ###
 
-## Orange PL
-alias bs4986-pcrf='ssh root@bs4986-pcrf'
+## bs5777, ING, 20180928
+alias tc11800-1='ssh -t tc11800-1'
 
-## bs5628, Telstra
-alias bs5628='ssh bs5628'
 
 ##VE/VMs
 alias ve01='ssh root@ve01'
@@ -46,6 +44,8 @@ alias tchv01='ssh tchv01'             # Hypervisor, VMware
 alias tchv02='ssh tchv02'             # Hypervisor, VMware
 alias tchv03='ssh tchv03'             # Hypervisor, KVM
 alias tchv04='ssh tchv04'             # Hypervisor, KVM
+alias tchv05='ssh tchv05'             # Hypervisor, VMWare
+alias tchv06='ssh tchv06'             # Hypervisor, VMWare
 
 ## Oslo Servers
 alias tcoslo01='ssh tcoslo01'
