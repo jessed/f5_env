@@ -40,4 +40,8 @@ set t_kb=
 map <C-X> :let @/=""<CR>
 
 
-let @c='v%:join€kd'
+" Join all lines up to the end of a block
+let @c='v%:join^M<80>kd'
+
+" Map ,P to paste-mode
+map <buffer> ,p :set paste<CR>a
