@@ -1,7 +1,7 @@
 #! /bin/bash
 
 firstRR=1
-newRecords=10
+newRecords=20000
 domain="f5test.net"
 
 rrPrefix="host"
@@ -12,19 +12,18 @@ bNet=10
 cNet=1
 dNet=1
 
-hostAddr="10.111.10.1"
-
 sed -e s/ZONE.ZONE/$domain/g zone.template > ${domain}.zone
 
 list=""
-total=$(($newRecords + firstRR))
+
 for (( rr=$firstRR; $rr <= $newRecords; rr++)); do
 
   # generate IP address
-  if [[ $dNet > 254 ]]; then
+  if (( $dNet > 254 )); then
     dNet=1; ((cNet++))
-  else
-    ((dNet++))
+    if (( $cNet > 254 )); then
+      cNet=1; ((bNet++))
+    fi
   fi
   addr="${aNet}.${bNet}.${cNet}.${dNet}"
 
@@ -36,8 +35,10 @@ for (( rr=$firstRR; $rr <= $newRecords; rr++)); do
   # Add this entry to the list
   list="${list}${curRR}"
 
+  ((dNet++))
 done
 
-#echo -en $list >> ${domain}.zone
+
+#printf "$list"
 printf "$list" >> ${domain}.zone
 

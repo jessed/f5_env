@@ -41,7 +41,7 @@ map <C-X> :let @/=""<CR>
 
 
 " Join all lines up to the end of a block
-let @c='v%:join^M<80>kd'
+let @c='v%:join'
 
 " Map ,P to paste-mode
 map <buffer> ,p :set paste<CR>a
