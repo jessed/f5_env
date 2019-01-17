@@ -77,7 +77,7 @@ aws_env() {
   if [[ -n "$1" ]]; then
     host=$1
   else
-    echo "USAGE: ltm_env <ltm_host> [port]"
+    echo "USAGE: aws_env <ltm_host> [port]"
     return
   fi
   if [[ -n "$2" ]]; then
@@ -140,7 +140,7 @@ aws_linux() {
   done
 
   # copy an updated sudoers file  
-  scp -P ${port} sudoers ${host}:
+  scp -P ${port} ${HOME}/ltm_helpers/env_files/sudoers ${host}:
 
 }
 

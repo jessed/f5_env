@@ -118,10 +118,10 @@ set -o vi
 
 
 # Enabled the oslo data nic
-start_datanic
+#start_datanic
 
 # Update the hostname
-set_hostname
+#set_hostname
 
 
 PROMPT_COMMAND=mk_prompt
