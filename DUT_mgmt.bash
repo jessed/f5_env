@@ -4,8 +4,7 @@
 ### Seattle Performance test
 ###
 
-## bs5777, ING, 20180928
-alias tc11800-1='ssh -t tc11800-1'
+alias smpp01='ssh root@smpp01'    # local SMPP VE
 
 
 ##VE/VMs
