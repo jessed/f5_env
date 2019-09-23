@@ -1,6 +1,11 @@
 # ~/.bash_functions
 # My function list is getting too involved for .bash_aliases
 
+# update /etc/cloud/cloud.cfg to preserve hostnames
+preserve_hostname() {
+  sudo sed -i 's/^preserve_hostname: false/preserve_hostname: true/' /etc/cloud/cloud.cfg
+}
+
 # start the ssh-agent using whatever $SSH_AUTH_SOCK is defined
 startagent() {
   if [[ -z "$SSH_AUTH_SOCK" ]]; then
@@ -73,9 +78,13 @@ addr() {
     fi
     info=$(ifconfig $iface)
     if [[ -f /etc/issue ]]; then # linux
-      mac=$(echo "$info" | awk '/HWaddr /{ print $5 }')
-      addr=$(echo "$info" | awk '/inet addr/ { print $2 }' | sed 's/addr://')
-      #addr=$(echo $info | awk '{match($0,/([[:digit:]]+\.){3}[[:digit:]]+ /, a)} { if (a[0] ) print a[0] }')
+      if [[ -f /etc/redhat-release ]]; then #Redhat
+        mac=$(echo "$info" | awk '/ether /{ print $2 }')
+        addr=$(echo "$info" | awk '/inet /{ print $2 }')
+      else # Ubuntu
+        mac=$(echo "$info" | awk '/HWaddr /{ print $5 }')
+        addr=$(echo "$info" | awk '/inet addr/ { print $2 }' | sed 's/addr://')
+      fi
     else # mac
       mac=$(echo "$info" | awk '/ether / { print $2}')
       addr=$(echo "$info" | awk '/inet / { print $2}')
@@ -105,6 +114,21 @@ src() {
   done
 }
 
+add_nginx() {
+  cat > nginx.repo << EOF
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/mainline/centos/7/$basearch/
+gpgcheck=0
+enabled=1
+EOF
+
+  sudo mv nginx.repo /etc/yum.repos.d
+  sudo yum update -y
+  sudo yum install -y nginx
+  sudo systemctl enable nginx
+  sudo systemctl start nginx
+}
 
 # redefine 'exit' to be screen-friendly (new method, compatible with OS X)
 exit() {
@@ -156,8 +180,3 @@ clrlog() {
   sudo service syslog-ng restart
 }
 
-
-# OS X
-listdomains() {
-  defaults domains | sed y/" "/"\n"/ | sed s/' '//
-}

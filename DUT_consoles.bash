@@ -23,6 +23,7 @@ alias con-tcvip08-2='telnet tc-con01   2013'
 alias con-tc10800-1='telnet tc-con01   2014'
 alias con-tc7800-1='telnet tc-con01    2015'
 alias con-tc3900-1='telnet tc-con01    2023'
+alias con-tc10350-1='telnet tc-con01   2024'
 
 alias con-tcvip01-1='telnet tc-con01   2025'
 alias con-tcvip01-2='telnet tc-con01   2026'

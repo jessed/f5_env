@@ -6,6 +6,9 @@
 
 alias smpp01='ssh root@smpp01'    # local SMPP VE
 
+alias c4800-1='ssh root@c4800-1.pl.pdsea.f5net.com'
+alias c4480-6='ssh root@c4480-6.pl.pdsea.f5net.com'
+
 
 ##VE/VMs
 alias ve01='ssh root@ve01'

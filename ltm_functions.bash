@@ -108,6 +108,12 @@ aws_env() {
   # comment out the 'clear' in .bash_logout
   ssh -p ${port} admin@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
 
+  # Add .bash_profile changes to /etc/skel/.bash_profile to persist across re-instantiations
+  ssh -p ${port} admin@${host} "echo -e \"\\n\\nalias src='source /shared/env.ltm'\">> /etc/skel/.bash_profile"
+  ssh -p ${port} admin@${host} "echo \"source /shared/env.ltm\">> /etc/skel/.bash_profile"
+  ssh -p ${port} admin@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" /etc/skel/.bash_profile"
+  ssh -p ${port} admin@${host} "echo -e \"\\nchk_vi_mode\">> /etc/skel/.bash_profile"
+
   # stop printing the motd on login
   #ssh admin@${host} "touch .hushlogin"
 
