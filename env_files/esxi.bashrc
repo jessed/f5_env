@@ -49,3 +49,5 @@ mk_prompt () {
 PROMPT_COMMAND=mk_prompt
 
 #set -o vi
+
+# vim: set syntax=sh tabstop=2 expandtab:

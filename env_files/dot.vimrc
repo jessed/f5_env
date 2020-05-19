@@ -1,6 +1,4 @@
 " source my custom filetypes (syntax highlighting)
-"so $HOME/.vim/myfiletypes.vim
-
 
 set modeline
 set nocompatible

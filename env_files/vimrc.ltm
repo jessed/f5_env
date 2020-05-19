@@ -1,7 +1,9 @@
 " LTM-compatible .vimrc
 
 syntax on
-set nocompatible
+set modeline
+set modelines=2
+"set nocompatible
 set shiftwidth=2
 set softtabstop=2
 set tabstop=2

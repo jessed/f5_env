@@ -107,6 +107,13 @@ mk_prompt () {
     PS1="${RED}[${CYAN}\A${RED}]${CLR}\n${COLOR}\h:\w >${CLR}"
     PS1="${TITLE}$PS1"
   fi
+
+  if [[ -f go_env || -f .go_env ]]; then
+    test -f go_env && source go_env
+    test -f .go_env && source .go_env
+  else
+    unset GOPATH
+  fi
 }
 
 
@@ -117,11 +124,7 @@ chk_vi_mode
 set -o vi
 
 
-# Enabled the oslo data nic
-#start_datanic
-
-# Update the hostname
-#set_hostname
-
-
 PROMPT_COMMAND=mk_prompt
+
+
+# vim: set syntax=sh tabstop=2 expandtab:

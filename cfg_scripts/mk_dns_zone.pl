@@ -4,13 +4,13 @@ use warnings;
 use strict;
 
 
-my $zone		= "j.amazon.com";
+my $zone		= "f5test.net";
 
-my $count   = 100000;
+my $count   = 3000;
 
-my $aNet    = 4;
-my $bNet    = 30;
-my $cNet    = 1;
+my $aNet    = 10;
+my $bNet    = 1;
+my $cNet    = 2;
 my $dNet    = 1;
 
 my @records;

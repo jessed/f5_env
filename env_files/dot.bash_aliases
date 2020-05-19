@@ -6,7 +6,7 @@ alias lh='ls -lh --color=always'
 alias la='ls -lA --color=always'
 alias ld='ls -ld --color=always'
 
-alias vi=vim                                        # convenience alias, need to deprecate
+#alias vi=vim                                        # convenience alias, need to deprecate
 alias mv='mv -i'                                    # Because I'm becoming a coward...
 alias cp='cp -i'                                    # Because I'm still a coward
 alias s='sudo -E'                                   # convenience alias
@@ -28,9 +28,11 @@ alias conns='netstat -anf inet'
 
 
 SOURCES=""
-SOURCES="$SOURCES .aws_functions.bash .apt_aliases.bash .virt_aliases.bash .centos_aliases.bash"
+SOURCES="$SOURCES .aws_functions.bash .apt_aliases.bash .virt_aliases.bash .centos_aliases.bash .docker_aliases.bash"
 
 for s in $SOURCES; do
   test -f $HOME/${s} && source $HOME/${s}
 done
 
+
+# vim: set syntax=sh tabstop=2 expandtab:

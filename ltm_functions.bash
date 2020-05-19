@@ -4,18 +4,18 @@
 # send the specified public key to the ~/.ssh/authorized_keys file on the remote host
 # SYNTAX:       synckey <host> [user] [/path/to/public/key]
 # default user: root
-# default pub:  ~/.ssh/ltm_shared_key.pub
+# default pub:  ~/.ssh/cpt_shared.pub
 synckey() {
   if [[ -z "$1" ]]; then
     echo "USAGE: synckey <hostname> [username] [pub key file]";
-    echo "Defaults to adding the contents of ~/.ssh/ltm_shared_key.pub"
+    echo "Defaults to adding the contents of ~/.ssh/cpt_shared.pub"
     echo "to ~/.ssh/authorized_keys on the remote system"
     return
   else
     HOST=$1
   fi
   if [ -z "$2" ]; then USER=root; else USER=$2; fi
-  if [ -z "$3" ]; then KEY="$HOME/.ssh/ltm_shared_key.pub"; else KEY=$3; fi
+  if [ -z "$3" ]; then KEY="$HOME/.ssh/cpt_shared.pub"; else KEY=$3; fi
 
   KEYS=$(cat $KEY)
   ssh ${USER}@${HOST} "echo $(< $KEY) >> ~/.ssh/authorized_keys"
@@ -56,7 +56,7 @@ ltm_env() {
   ssh -p ${port} root@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
 
   # Run 'chk_vi_mode()' on login to set bash vi-mode
-  ssh -p ${port} root@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+  # ssh -p ${port} root@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
 
   # comment out the 'clear' in .bash_logout
   ssh -p ${port} root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
@@ -138,16 +138,36 @@ aws_linux() {
   fi
 
   files=$(ls ${HOME}/ltm_helpers/env_files/dot*)
+  files="$files ${HOME}/ltm_helpers/env_files/sudoers"
+  files="$files ${HOME}/ltm_helpers/env_files/nginx.repo"
 
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
-    #echo scp -P ${port} $f ${host}:${new}
     scp -P ${port} $f ${host}:${new}
   done
 
-  # copy an updated sudoers file  
-  scp -P ${port} ${HOME}/ltm_helpers/env_files/sudoers ${host}:
+  ssh -p ${port} ${host} 'sudo chmod 440 sudoers'
+  ssh -p ${port} ${host} 'sudo chown root.root sudoers'
+  ssh -p ${port} ${host} "sudo sed -i -e 's/ - set_hostname/# - set_hostname/' /etc/cloud/cloud.cfg"
+  ssh -p ${port} ${host} 'ln -s /etc/sysconfig/network-scripts/'
+}
 
+## Update local linux VM host environment
+vm_linux() {
+  if [[ -n $1 ]]; then
+    host=$1
+  else
+    echo "USAGE: vm_linux {host}"
+    return
+  fi
+
+  files=$(ls ${HOME}/ltm_helpers/env_files/dot*)
+  files="$files ${HOME}/ltm_helpers/env_files/sudoers"
+
+  for f in $files; do
+    new=$(basename $f | sed 's/dot//')
+    scp -P ${port} $f ${host}:${new}
+  done
 }
 
 

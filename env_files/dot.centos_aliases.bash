@@ -22,3 +22,18 @@ alias syr='sudo yum remove'
 #alias sygi='sudo yum -C groupinstall'
 #alias sygu='sudo yum -C groupupdate' # groupupdate is just an alias for 'groupinstall'
 #alias sygr='sudo yum -C groupremove'
+
+
+# dnf alias
+alias sdi='sudo dnf install'
+alias sdmc='sudo dnf makecache'
+alias sdr='sudo dnf remove'
+alias sdu='sudo dnf upgrade'
+alias ds='dnf search'
+alias dl='dnf list'
+alias di='dnf info'
+alias dli='dnf list installed'
+alias sdds='sudo dnf distro-sync'
+#alias d='dnf '
+
+# vim: set syntax=sh tabstop=2 expandtab:
