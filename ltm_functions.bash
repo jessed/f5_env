@@ -1,4 +1,4 @@
-# ltm_helpers.bash
+# ltm_functions.bash
 # functions to speed up common tasks when working with BIG-IP
 
 # send the specified public key to the ~/.ssh/authorized_keys file on the remote host
@@ -26,8 +26,8 @@ synckey() {
 # command, which sources the ~/.env.ltm
 # SYNTAX:  ltm_env <host>
 ltm_env() {
-  local ENVFILE="${HOME}/ltm_helpers/env_files/env.ltm"
-  local VIMRC="${HOME}/ltm_helpers/env_files/vimrc.ltm"
+  local ENVFILE="${HOME}/f5_env/env_files/env.ltm"
+  local VIMRC="${HOME}/f5_env/env_files/vimrc.ltm"
 
   if [[ -n "$1" ]]; then
     host=$1
@@ -71,8 +71,8 @@ ltm_env() {
 
 # Perform initial environment customization for AWS instances
 aws_env() {
-  local ENVFILE="${HOME}/ltm_helpers/env_files/env.ltm"
-  local VIMRC="${HOME}/ltm_helpers/env_files/vimrc.ltm"
+  local ENVFILE="${HOME}/f5_env/env_files/env.ltm"
+  local VIMRC="${HOME}/f5_env/env_files/vimrc.ltm"
 
   if [[ -n "$1" ]]; then
     host=$1
@@ -137,9 +137,9 @@ aws_linux() {
     port=22
   fi
 
-  files=$(ls ${HOME}/ltm_helpers/env_files/dot*)
-  files="$files ${HOME}/ltm_helpers/env_files/sudoers"
-  files="$files ${HOME}/ltm_helpers/env_files/nginx.repo"
+  files=$(ls ${HOME}/f5_env/env_files/dot*)
+  files="$files ${HOME}/f5_env/env_files/sudoers"
+  files="$files ${HOME}/f5_env/env_files/nginx.repo"
 
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
@@ -161,8 +161,8 @@ vm_linux() {
     return
   fi
 
-  files=$(ls ${HOME}/ltm_helpers/env_files/dot*)
-  files="$files ${HOME}/ltm_helpers/env_files/sudoers"
+  files=$(ls ${HOME}/f5_env/env_files/dot*)
+  files="$files ${HOME}/f5_env/env_files/sudoers"
 
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
