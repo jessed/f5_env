@@ -139,7 +139,7 @@ cloud_linux() {
 
   files=$(ls ${HOME}/f5_env/env_files/dot*)
   files="$files ${HOME}/f5_env/env_files/sudoers"
-  #files="$files ${HOME}/f5_env/env_files/nginx.repo"
+  files="$files ${HOME}/f5_env/env_files/nginx.repo"
 
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
@@ -148,7 +148,8 @@ cloud_linux() {
 
   ssh -p ${port} ${host} 'sudo chmod 440 sudoers'
   ssh -p ${port} ${host} 'sudo chown root.root sudoers'
-  ssh -p ${port} ${host} "sudo sed -i -e 's/ - set_hostname/# - set_hostname/' /etc/cloud/cloud.cfg"
+  #ssh -p ${port} ${host} "sudo sed -i -e 's/ - set_hostname/# - set_hostname/' /etc/cloud/cloud.cfg"
+  ssh -p ${port} ${host} "sudo sed -i -e 's/preserve_hostname: false/preserve_hostname: true/' /etc/cloud/cloud.cfg"
   ssh -p ${port} ${host} 'test -d /etc/sysconfig/network-scripts && ln -s /etc/sysconfig/network-scripts/'
   ssh -p ${port} ${host} 'test -d /etc/netplan && ln -s /etc/netplan/'
 }
