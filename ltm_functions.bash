@@ -123,7 +123,7 @@ aws_env() {
 
 
 ## Update AWS linux host environment
-aws_linux() {
+cloud_linux() {
   if [[ -z "$1" ]]; then
     echo "USAGE: aws_linux {aws_host} [port] (default: 22)"
     return
@@ -139,7 +139,7 @@ aws_linux() {
 
   files=$(ls ${HOME}/f5_env/env_files/dot*)
   files="$files ${HOME}/f5_env/env_files/sudoers"
-  files="$files ${HOME}/f5_env/env_files/nginx.repo"
+  #files="$files ${HOME}/f5_env/env_files/nginx.repo"
 
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
@@ -149,7 +149,8 @@ aws_linux() {
   ssh -p ${port} ${host} 'sudo chmod 440 sudoers'
   ssh -p ${port} ${host} 'sudo chown root.root sudoers'
   ssh -p ${port} ${host} "sudo sed -i -e 's/ - set_hostname/# - set_hostname/' /etc/cloud/cloud.cfg"
-  ssh -p ${port} ${host} 'ln -s /etc/sysconfig/network-scripts/'
+  ssh -p ${port} ${host} 'test -d /etc/sysconfig/network-scripts && ln -s /etc/sysconfig/network-scripts/'
+  ssh -p ${port} ${host} 'test -d /etc/netplan && ln -s /etc/netplan/'
 }
 
 ## Update local linux VM host environment
@@ -157,8 +158,12 @@ vm_linux() {
   if [[ -n $1 ]]; then
     host=$1
   else
-    echo "USAGE: vm_linux {host}"
+    echo "USAGE: vm_linux {host} [port]"
     return
+  fi
+  
+  if [[ -n $2 ]]; then port=$2
+  else                 port=22
   fi
 
   files=$(ls ${HOME}/f5_env/env_files/dot*)
