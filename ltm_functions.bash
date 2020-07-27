@@ -122,6 +122,57 @@ aws_env() {
 }
 
 
+cloud_env() {
+  local ENVFILE="${HOME}/f5_env/env_files/env.ltm"
+  local VIMRC="${HOME}/f5_env/env_files/vimrc.ltm"
+
+  if [[ -n "$1" ]]; then host=$1
+  else                   echo "USAGE: aws_env <ltm_host> [port]"; return
+  fi
+
+  if [[ -n "$2" ]]; then user=$2
+  else                   user=admin
+  fi
+
+  if [[ -n "$3" ]]; then port=$3
+  else                   port=22
+  fi
+
+	# First step: change admin user shell to bash (from tmsh)
+	ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"
+
+  # copy the new environment file into place
+  scp -P ${port} ${ENVFILE} ${user}@${host}:/shared/env.ltm
+  scp -P ${port} ${VIMRC}   ${user}@${host}:/shared/vimrc.ltm
+  ssh -p ${port} ${user}@${host} "ln -sf /shared/env.ltm .env.ltm"
+  ssh -p ${port} ${user}@${host} "ln -sf /shared/vimrc.ltm .vimrc"
+
+  # update existing .bash_profile to source new environment file
+  ssh -p ${port} ${user}@${host} "echo \"alias src='source /shared/env.ltm'\">> .bash_profile"
+  ssh -p ${port} ${user}@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
+
+  #  don't change to the /config directory on login
+  ssh -p ${port} ${user}@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
+
+  # Run 'chk_vi_mode()' on login to set bash vi-mode
+  ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+
+  # comment out the 'clear' in .bash_logout
+  ssh -p ${port} ${user}@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
+
+  # Add .bash_profile changes to /etc/skel/.bash_profile to persist across re-instantiations
+  ssh -p ${port} ${user}@${host} "echo -e \"\\n\\nalias src='source /shared/env.ltm'\">> /etc/skel/.bash_profile"
+  ssh -p ${port} ${user}@${host} "echo \"source /shared/env.ltm\">> /etc/skel/.bash_profile"
+  ssh -p ${port} ${user}@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" /etc/skel/.bash_profile"
+  ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> /etc/skel/.bash_profile"
+
+  # stop printing the motd on login
+  #ssh ${user}@${host} "touch .hushlogin"
+
+  # bind 'ctrl+l to the bash 'clear-screen' command
+  ssh -p ${port} ${user}@${host} "echo 'Control-l: clear-screen' > .inputrc"
+}
+
 ## Update AWS linux host environment
 cloud_linux() {
   if [[ -z "$1" ]]; then
@@ -222,3 +273,7 @@ reminder() {
 #  done
 #}
 
+strip_regkeys() {
+  awk '/^Registration/ { print $4 }' $1
+  tail $1
+}
