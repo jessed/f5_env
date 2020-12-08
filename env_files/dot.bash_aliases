@@ -21,6 +21,8 @@ alias perf='screen -c ~/.screen/perf -xRRS perf'    # performance screen session
 alias stat='stat -x'
 #alias whois='whois -H'
 alias tail='tail -n20'          # specifying the number of lines a second time fails on mac
+alias sctl='sudo systemctl'
+
 
 alias ping='ping -n'
 alias traceroute='traceroute -nw 1'

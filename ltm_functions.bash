@@ -57,6 +57,7 @@ ltm_env() {
 
   # Run 'chk_vi_mode()' on login to set bash vi-mode
   # ssh -p ${port} root@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+  ssh -p ${port} ${user}@${host} "echo -e \"\\nset -o vi\">> .bash_profile"
 
   # comment out the 'clear' in .bash_logout
   ssh -p ${port} root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
@@ -74,13 +75,13 @@ aws_env() {
   local ENVFILE="${HOME}/f5_env/env_files/env.ltm"
   local VIMRC="${HOME}/f5_env/env_files/vimrc.ltm"
 
-  if [[ -n "$1" ]]; then
+  if [[ -n $1 ]]; then
     host=$1
   else
     echo "USAGE: aws_env <ltm_host> [port]"
     return
   fi
-  if [[ -n "$2" ]]; then
+  if [[ -n $2 ]]; then
     port=$2
   else
     port=22
@@ -102,9 +103,10 @@ aws_env() {
 
   #  don't change to the /config directory on login
   ssh -p ${port} ${user}@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
+  ssh -p ${port} ${user}@${host} "echo -e \"\\nset -o vi\">> .bash_profile"
 
   # Run 'chk_vi_mode()' on login to set bash vi-mode
-  ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
+  #ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
 
   # comment out the 'clear' in .bash_logout
   ssh -p ${port} ${user}@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
@@ -113,7 +115,8 @@ aws_env() {
   ssh -p ${port} ${user}@${host} "echo -e \"\\n\\nalias src='source /shared/env.ltm'\">> /etc/skel/.bash_profile"
   ssh -p ${port} ${user}@${host} "echo \"source /shared/env.ltm\">> /etc/skel/.bash_profile"
   ssh -p ${port} ${user}@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" /etc/skel/.bash_profile"
-  ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> /etc/skel/.bash_profile"
+  #ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> /etc/skel/.bash_profile"
+  ssh -p ${port} ${user}@${host} "echo -e \"\\nset -o vi\">> /etc/skel/.bash_profile"
 
   # stop printing the motd on login
   #ssh ${user}@${host} "touch .hushlogin"
@@ -128,7 +131,7 @@ azure_env() {
   local VIMRC="${HOME}/f5_env/env_files/vimrc.ltm"
 
   if [[ -n "$1" ]]; then host=$1
-  else                   echo "USAGE: $0 <ltm_host> [port]"; return
+  else                   echo "USAGE: $0 <ltm_host> [user]"; return
   fi
 
   if [[ -n "$2" ]]; then user=$2
@@ -167,13 +170,13 @@ azure_env() {
   ssh -p ${port} ${user}@${host} "echo -e \"\\n\\nalias src='source /shared/env.ltm'\">> /etc/skel/.bash_profile"
   ssh -p ${port} ${user}@${host} "echo \"source /shared/env.ltm\">> /etc/skel/.bash_profile"
   ssh -p ${port} ${user}@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" /etc/skel/.bash_profile"
-  ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> /etc/skel/.bash_profile"
+  ssh -p ${port} ${user}@${host} "echo -e \"\\nset -o vi\">> /etc/skel/.bash_profile"
 
   # stop printing the motd on login
   #ssh ${user}@${host} "touch .hushlogin"
 
   # bind 'ctrl+l to the bash 'clear-screen' command
-  ssh -p ${port} ${user}@${host} "echo 'Control-l: clear-screen' > .inputrc"
+  #ssh -p ${port} ${user}@${host} "echo 'Control-l: clear-screen' > .inputrc"
 }
 
 ## Update AWS linux host environment
@@ -190,10 +193,15 @@ cloud_linux() {
   else
     port=22
   fi
+  if [[ -n $3 ]]; then
+    user=$3
+  else
+    user=admin
+  fi
 
   files=$(ls ${HOME}/f5_env/env_files/dot*)
   files="$files ${HOME}/f5_env/env_files/sudoers"
-  files="$files ${HOME}/f5_env/env_files/nginx.repo"
+  #files="$files ${HOME}/f5_env/env_files/nginx.repo"
 
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
@@ -204,8 +212,9 @@ cloud_linux() {
   ssh -p ${port} ${host} 'sudo chown root.root sudoers'
   #ssh -p ${port} ${host} "sudo sed -i -e 's/ - set_hostname/# - set_hostname/' /etc/cloud/cloud.cfg"
   ssh -p ${port} ${host} "sudo sed -i -e 's/preserve_hostname: false/preserve_hostname: true/' /etc/cloud/cloud.cfg"
-  ssh -p ${port} ${host} 'test -d /etc/sysconfig/network-scripts && ln -s /etc/sysconfig/network-scripts/'
-  ssh -p ${port} ${host} 'test -d /etc/netplan && ln -s /etc/netplan/'
+  #ssh -p ${port} ${host} 'test -d /etc/sysconfig/network-scripts && ln -s /etc/sysconfig/network-scripts/'
+  #ssh -p ${port} ${host} 'test -d /etc/netplan && ln -s /etc/netplan/'
+  ssh -p ${port} ${host} 'sudo mv sudoers /etc'
 }
 
 ## Update local linux VM host environment

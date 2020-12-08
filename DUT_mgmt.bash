@@ -4,6 +4,10 @@
 ### SSH aliases for CPT resources
 ###
 
+## PTT
+alias i7000-2='ssh i7000-2.pl.pdsea.f5net.com'
+alias i7000-4='ssh i7000-4.pl.pdsea.f5net.com'
+
 ##VE/VMs
 # CPT VE
 alias ve01='ssh ve01'    # bs027 - AT&T IP-SEC
@@ -31,6 +35,8 @@ alias tc12250-2='ssh root@tc12250-2.cpt.gtp.f5net.com'  # 172.22.57.108
 
 alias tc15800-1='ssh root@i15000-1.cpt.gtp.f5net.com'  # 172.22.57.141
 alias tc15800-2='ssh root@i15000-2.cpt.gtp.f5net.com'  # 172.22.57.157
+
+alias i5000-1='ssh root@i5000-1.cpt.gtp.f5net.com'
 
 
 # Infrastructure systems / Hypervisors

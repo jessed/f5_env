@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 my $domain      = "f5test.net";
-my $newRecords  = 20000;
+my $newRecords  = 5000;
 my $firstRR     = 1;
 
 my $rrPrefix    = "host";
@@ -62,17 +62,17 @@ sub zone_header() {
 
   print $file <<END;
 \$ORIGIN .
-\$TTL 10	; 10 seconds
-$domain		IN SOA	ns1.$domain. root.$domain. (
-				2015101301 ; serial
-				21600      ; refresh ( 6 hours)
-				 3600      ; retry   (46 minutes 40 seconds)
-				64800      ; expire  (18 hours)
-				   10      ; minimum (10 seconds)
-				)
-			NS	ns1.$domain.
-			A	10.111.255.253
+\$TTL 10  ; 10 seconds
+$domain    IN SOA  ns1.$domain. root.$domain. (
+        2015101301 ; serial
+        21600      ; refresh ( 6 hours)
+         3600      ; retry   (46 minutes 40 seconds)
+        64800      ; expire  (18 hours)
+           10      ; minimum (10 seconds)
+        )
+      NS  ns1.$domain.
 \$ORIGIN $domain.
+ns1                           A  10.111.255.253
 
 END
 }
