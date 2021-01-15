@@ -84,8 +84,8 @@ watchhost() {
 }
 
 # List all interfaces with addresses along with the address and mac
-unset -f addr2
-addr2() {
+unset -f addr
+addr() {
   match="(lo|gif|stf|pop|awdl|bridge|utun|fw|vnic)"
 
   #nics=$(ip link show | awk '/^[[:digit:]]/ {gsub(":"," "); print $2}')
@@ -129,41 +129,10 @@ addr2() {
 }
 
 # List all interfaces and addresses using the 'ip' command
-unset addr3
-addr3() {
+unset addr2
+addr2() {
   ip -4 -o addr show | awk '{print $2"\t"$4}'
 }
-
-# List all interfaces with addresses along with the address and mac
-unset -f addr
-addr() {
-  nics=$(ifconfig -a | awk '/^[a-z]/ { gsub(":[[:space:]]"," "); print $1}')
-  match="(lo|gif|stf|pop|awdl|bridge|utun|fw|vnic)"
-
-  for n in $nics; do
-    if [[ $n =~ $match ]]; then continue
-    else iface=$n
-    fi
-    info=$(ifconfig $iface)
-    if [[ -f /etc/issue ]]; then # linux
-      if [[ -f /etc/redhat-release ]]; then #Redhat
-        mac=$(echo "$info" | awk '/ether /{ print $2 }')
-        addr=$(echo "$info" | awk '/inet /{ print $2 }')
-      else # Ubuntu
-        mac=$(echo "$info" | awk '/HWaddr /{ print $5 }')
-        addr=$(echo "$info" | awk '/inet addr/ { print $2 }' | sed 's/addr://')
-      fi
-    else # mac
-      mac=$(echo "$info" | awk '/ether / { print $2}')
-      addr=$(echo "$info" | awk '/inet / { print $2}')
-    fi
-    if [[ -n "$addr" ]]; then
-      printf "%-15s %15s (%s)\n" $n $addr $mac
-    fi
-    unset -v iface info addr mac
-  done
-}
-
 
 # source environment files more intelligently
 src() {

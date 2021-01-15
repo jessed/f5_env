@@ -215,6 +215,7 @@ cloud_linux() {
   #ssh -p ${port} ${host} 'test -d /etc/sysconfig/network-scripts && ln -s /etc/sysconfig/network-scripts/'
   #ssh -p ${port} ${host} 'test -d /etc/netplan && ln -s /etc/netplan/'
   ssh -p ${port} ${host} 'sudo mv sudoers /etc'
+  ssh -p ${port} ${host} 'touch ~/.hushlogin'
 }
 
 ## Update local linux VM host environment
