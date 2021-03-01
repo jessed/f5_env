@@ -45,28 +45,28 @@ ltm_env() {
   # copy the new environment file into place
   scp -P ${port} ${ENVFILE} root@${host}:/shared/env.ltm
   scp -P ${port} ${VIMRC}   root@${host}:/shared/vimrc.ltm
-  ssh -p ${port} root@${host} "ln -sf /shared/env.ltm .env.ltm"
-  ssh -p ${port} root@${host} "ln -sf /shared/vimrc.ltm .vimrc"
+  ssh -p ${port} ${host} "ln -sf /shared/env.ltm .env.ltm"
+  ssh -p ${port} ${host} "ln -sf /shared/vimrc.ltm .vimrc"
 
   # update existing .bash_profile to source new environment file
-  ssh -p ${port} root@${host} "echo \"alias src='cd ; source /shared/env.ltm'\">> .bash_profile"
-  ssh -p ${port} root@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
+  ssh -p ${port} ${host} "echo \"alias src='cd ; source /shared/env.ltm'\">> .bash_profile"
+  ssh -p ${port} ${host} "echo \"source /shared/env.ltm\">> .bash_profile"
 
   #  don't change to the /config directory on login
-  ssh -p ${port} root@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
+  ssh -p ${port} ${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
 
   # Run 'chk_vi_mode()' on login to set bash vi-mode
   # ssh -p ${port} root@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
-  ssh -p ${port} ${user}@${host} "echo -e \"\\nset -o vi\">> .bash_profile"
+  ssh -p ${port} ${host} "echo -e \"\\nset -o vi\">> .bash_profile"
 
   # comment out the 'clear' in .bash_logout
-  ssh -p ${port} root@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
+  ssh -p ${port} ${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
 
   # stop printing the motd on login
-  ssh -p ${port} root@${host} "touch .hushlogin"
+  ssh -p ${port} ${host} "touch .hushlogin"
 
   # bind 'ctrl+l to the bash 'clear-screen' command
-  ssh -p ${port} root@${host} "echo 'Control-l: clear-screen' > .inputrc"
+  ssh -p ${port} ${host} "echo 'Control-l: clear-screen' > .inputrc"
 
 }
 
@@ -182,7 +182,7 @@ azure_env() {
 ## Update AWS linux host environment
 cloud_linux() {
   if [[ -z "$1" ]]; then
-    echo "USAGE: aws_linux {aws_host} [port] (default: 22)"
+    echo "USAGE: aws_linux {aws_host} [port] (default: 22) [user] (default: admin)"
     return
   else
     host=$1
@@ -256,37 +256,9 @@ reminder() {
 }
 
 
-### watchhost() moved to default bash_functions
-
-# monitor a host and alert when the system starts responding to pings
-# doesn't initialize the notification until after the system stops responding
-#watchhost() {
-#  go=1
-#  while [ $go -eq 1 ]; do
-#    ping -c1 -W 1 $1 >/dev/null 2>&1
-#    if [ $? -eq 0 ]; then
-#      #echo "ping succeeded, sleeping"
-#      sleep 1
-#    else
-#      #echo "ping failed, setting go = 0"
-#      echo "No echo response, entering notification phase"
-#      go=0
-#      sleep 1
-#    fi
-#  done
-#
-#  while [ 1 ]; do
-#    ping -c1 $1 >/dev/null 2>&1
-#    if [ $? -ne 0 ]; then
-#      sleep 1
-#    else
-#      echo -e "$1 is up\a"
-#      sleep 1
-#    fi
-#  done
-#}
 
 strip_regkeys() {
   awk '/^Registration/ { print $4 }' $1
+  echo -e "\n\n"
   tail $1
 }
