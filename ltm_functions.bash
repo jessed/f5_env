@@ -43,8 +43,8 @@ ltm_env() {
   fi
 
   # copy the new environment file into place
-  scp -P ${port} ${ENVFILE} root@${host}:/shared/env.ltm
-  scp -P ${port} ${VIMRC}   root@${host}:/shared/vimrc.ltm
+  scp -P ${port} ${ENVFILE} ${host}:/shared/env.ltm
+  scp -P ${port} ${VIMRC}   ${host}:/shared/vimrc.ltm
   ssh -p ${port} ${host} "ln -sf /shared/env.ltm .env.ltm"
   ssh -p ${port} ${host} "ln -sf /shared/vimrc.ltm .vimrc"
 
@@ -144,6 +144,9 @@ azure_env() {
 
 	# First step: change admin user shell to bash (from tmsh)
 	ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"
+  ssh -p ${port} ${user}@${host} "echo /shared >> /config/ssh/scp.whitelist"
+  ssh -p ${port} ${user}@${host} "echo /home/${user} >> /config/ssh/scp.whitelist"
+  ssh -p ${port} ${user}@${host} "tmsh restart sys service sshd"
 
   # copy the new environment file into place
   scp -P ${port} ${ENVFILE} ${user}@${host}:/shared/env.ltm
@@ -259,6 +262,6 @@ reminder() {
 
 strip_regkeys() {
   awk '/^Registration/ { print $4 }' $1
-  echo -e "\n\n"
-  tail $1
+  echo -e "\n"
+  tail -6 $1
 }
