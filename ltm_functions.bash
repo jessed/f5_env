@@ -71,58 +71,54 @@ ltm_env() {
 }
 
 # Perform initial environment customization for AWS instances
-aws_env() {
+cloud_env() {
   local ENVFILE="${HOME}/f5_env/env_files/env.ltm"
   local VIMRC="${HOME}/f5_env/env_files/vimrc.ltm"
 
   if [[ -n $1 ]]; then
     host=$1
   else
-    echo "USAGE: aws_env <ltm_host> [port]"
+    echo "USAGE: aws_env <ltm_host> [azure|aws|gcp|other] [port]"
     return
   fi
-  if [[ -n $2 ]]; then
-    port=$2
-  else
-    port=22
-  fi
-  user=admin
+  if [[ -n $2 ]]; then cloud=$2; else cloud=other; fi
+  if [[ -n $3 ]]; then port=$2; else port=22; fi
+
+  if [[ $cloud =~ "azure" ]]; then user=azadmin; else user=admin; fi
 
 	# First step: change admin user shell to bash (from tmsh)
-	ssh -p ${port} ${user}@${host} "modify auth user admin shell bash; save sys config"
+  ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"
+
+  # Update SCP allowed locations
+  locations="/shared"
+  locations="$locations\\\\n/home/${user}"
+  ssh -p ${port} ${user}@${host} "echo -e $locations >> /config/ssh/scp.whitelist; tmsh restart sys service sshd"
 
   # copy the new environment file into place
-  scp -P ${port} ${ENVFILE} ${user}@${host}:/shared/env.ltm
-  scp -P ${port} ${VIMRC}   ${user}@${host}:/shared/vimrc.ltm
-  ssh -p ${port} ${user}@${host} "ln -sf /shared/env.ltm .env.ltm"
-  ssh -p ${port} ${user}@${host} "ln -sf /shared/vimrc.ltm .vimrc"
+  scp -P ${port} ${ENVFILE} ${VIMRC} ${user}@${host}:/shared
+  ssh -p ${port} ${user}@${host} "ln -sf /shared/env.ltm .env.ltm; ln -sf /shared/vimrc.ltm .vimrc"
+  cmd1="ln -sf /shared/env.ltm .env.ltm; ln -sf /shared/vimrc.ltm .vimrc"
 
-  # update existing .bash_profile to source new environment file
-  ssh -p ${port} ${user}@${host} "echo \"alias src='source /shared/env.ltm'\">> .bash_profile"
-  ssh -p ${port} ${user}@${host} "echo \"source /shared/env.ltm\">> .bash_profile"
+  # update existing .bash_profile and /etc/skel/.bash_profile
+  strings="alias src=\'source /shared/env.ltm\'"
+  strings="$strings\\\\nsource /shared/env.ltm"
+  strings="$strings\\\\nset -o vi"
 
-  #  don't change to the /config directory on login
-  ssh -p ${port} ${user}@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" .bash_profile"
-  ssh -p ${port} ${user}@${host} "echo -e \"\\nset -o vi\">> .bash_profile"
-
-  # Run 'chk_vi_mode()' on login to set bash vi-mode
-  #ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> .bash_profile"
-
-  # comment out the 'clear' in .bash_logout
-  ssh -p ${port} ${user}@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
-
-  # Add .bash_profile changes to /etc/skel/.bash_profile to persist across re-instantiations
-  ssh -p ${port} ${user}@${host} "echo -e \"\\n\\nalias src='source /shared/env.ltm'\">> /etc/skel/.bash_profile"
-  ssh -p ${port} ${user}@${host} "echo \"source /shared/env.ltm\">> /etc/skel/.bash_profile"
-  ssh -p ${port} ${user}@${host} "sed -i -e \"s/^cd \/config/#cd \/config/\" /etc/skel/.bash_profile"
-  #ssh -p ${port} ${user}@${host} "echo -e \"\\nchk_vi_mode\">> /etc/skel/.bash_profile"
-  ssh -p ${port} ${user}@${host} "echo -e \"\\nset -o vi\">> /etc/skel/.bash_profile"
-
-  # stop printing the motd on login
-  #ssh ${user}@${host} "touch .hushlogin"
+  cmd2="echo -e $strings >> .bash_profile"
+  cmd3="echo -e $strings >> /etc/skel/.bash_profile"
 
   # bind 'ctrl+l to the bash 'clear-screen' command
-  ssh -p ${port} ${user}@${host} "echo 'Control-l: clear-screen' > .inputrc"
+  cmd4="echo 'Control-l: clear-screen' > .inputrc"
+
+  # don't change to the /config directory on login
+  cmd5="sed -i  's/^cd \/config/#cd \/config/' .bash_profile /etc/skel/.bash_profile"
+
+  # comment out the 'clear' in .bash_logout
+  #ssh -p ${port} ${user}@${host} "sed -i -e \"s/^clear/#clear/\" .bash_logout"
+  cmd6="sed -i  's/^clear/#clear/' .bash_logout"
+
+  # run all commands with a single SSH command
+  ssh -p ${port} ${user}@${host} "$cmd1 ; $cmd2 ; $cmd3 ; $cmd4 ; $cmd5 ; $cmd6"
 }
 
 
@@ -130,17 +126,14 @@ azure_env() {
   local ENVFILE="${HOME}/f5_env/env_files/env.ltm"
   local VIMRC="${HOME}/f5_env/env_files/vimrc.ltm"
 
-  if [[ -n "$1" ]]; then host=$1
-  else                   echo "USAGE: $0 <ltm_host> [user]"; return
+  if [[ -n "$1" ]]; then
+    host=$1
+  else
+    echo "USAGE: $0 <ltm_host> [user]"
+    return
   fi
-
-  if [[ -n "$2" ]]; then user=$2
-  else                   user=azadmin
-  fi
-
-  if [[ -n "$3" ]]; then port=$3
-  else                   port=22
-  fi
+  if [[ -n $2 ]]; then user=$2; else user=azadmin; fi
+  if [[ -n $3 ]]; then port=$3; else port=22; fi
 
 	# First step: change admin user shell to bash (from tmsh)
 	ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"
@@ -185,7 +178,7 @@ azure_env() {
 ## Update AWS linux host environment
 cloud_linux() {
   if [[ -z "$1" ]]; then
-    echo "USAGE: aws_linux {aws_host} [port] (default: 22) [user] (default: admin)"
+    echo "USAGE: ${FUNCNAME[0]} {host} [port] (default: 22) [user] (default: admin)"
     return
   else
     host=$1
