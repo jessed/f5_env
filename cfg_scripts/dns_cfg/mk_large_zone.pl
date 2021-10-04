@@ -37,6 +37,7 @@ for ( my $rr = $firstRR; $rr <= $newRecords; $rr++ ) {
   if ( $cNet > 254 ) { $cNet = 1; $bNet++; }
 
   $addr   = "$aNet.$bNet.$cNet.$dNet";
+  #$host   = sprintf("%s%06d", $rrPrefix, $rr);
   $host   = sprintf("%s%06d", $rrPrefix, $rr);
 
   # Add host and address to list

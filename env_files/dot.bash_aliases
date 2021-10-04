@@ -22,6 +22,7 @@ alias stat='stat -x'
 #alias whois='whois -H'
 alias tail='tail -n20'          # specifying the number of lines a second time fails on mac
 alias sctl='sudo systemctl'
+alias my_ip='curl http://icanhazip.com'
 
 
 alias ping='ping -n'
