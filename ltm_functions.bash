@@ -164,12 +164,12 @@ cloud_linux() {
 
   ssh -p ${port} ${host} 'sudo chmod 440 sudoers'
   ssh -p ${port} ${host} 'sudo chown root.root sudoers'
-  ssh -p ${port} ${host} "sudo sed -i -e 's/preserve_hostname: false/preserve_hostname: true/' /etc/cloud/cloud.cfg"
+  ssh -p ${port} ${host} 'sudo sed -i -e "s/preserve_hostname: false/preserve_hostname: true/" /etc/cloud/cloud.cfg'
   ssh -p ${port} ${host} 'sudo mv sudoers /etc'
   ssh -p ${port} ${host} 'touch ~/.hushlogin'
   cmd1='sudo chmod 440 sudoers'
   cmd2='sudo chown root.root sudoers'
-  cmd3='sudo sed -i -e 's/preserve_hostname: false/preserve_hostname: true/' /etc/cloud/cloud.cfg'
+  cmd3='sudo sed -i -e "s/preserve_hostname: false/preserve_hostname: true/" /etc/cloud/cloud.cfg'
   cmd4='sudo mv sudoers /etc'
   cmd5='touch .hushlogin'
 }
