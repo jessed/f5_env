@@ -35,28 +35,28 @@ my $DEBUG   = $opts{'D'} || 0;
 my $cfg  = {
   'mkTotal'         =>  ($opts{'c'} || 10), # The total number of objects to create
   'printVips'       =>  1,          # 
-  'printPools'      =>  0,          # 
-  'uniqueVipAddr'   =>  1,          # 0: use same address, increment ports. 1: unique adresses, same port
+  'printPools'      =>  1,          # 
+  'uniqueVipAddr'   =>  0,          # 0: use same address, increment ports. 1: unique adresses, same port
   'vipPrefix'       =>  'vs',       # 
   'vipPostfix'      =>  "_http",         # 
   'vipStart'        =>  1,          # 
   'vip_aNet'        =>  10,         # 
-  'vip_bNet'        =>  109,        # 
-  'vip_cNet'        =>  31,         # 
-  'vip_dNet'        =>  1,          # 
-  'vipPort'         =>  80,         # 
+  'vip_bNet'        =>  210,        # 
+  'vip_cNet'        =>  10,         # 
+  'vip_dNet'        =>  4,          # 
+  'vipPort'         =>  9001,         # 
   'poolPrefix'      =>  'p',        # 
-  'poolPostfix'     =>  '_80',      # 
-  'poolStart'       =>  1,          # 
+  'poolPostfix'     =>  '',         # 
+  'poolStart'       =>  9001,          # 
   'poolMaxUsage'    =>  1,          # 
-  'poolMbrCount'    =>  8,          # Number of nodes per-pool
+  'poolMbrCount'    =>  1,          # Number of nodes per-pool
   'uniquePoolMbrs'  =>  0,          # 0: reuse original nodes, 1: never reuse nodes, 2: reuse nodes $nodeMaxUsage times
-  'nodeMaxUsage'    =>  10,         # 
+  'nodeMaxUsage'    =>  1000,       # 
   'node_aNet'       =>  10,         # 
-  'node_bNet'       =>  110,        # 
-  'node_cNet'       =>  100,        # 
-  'node_dNet'       =>  1,          # 
-  'nodePort'        =>  80,        # 
+  'node_bNet'       =>  212,        # 
+  'node_cNet'       =>  10,         # 
+  'node_dNet'       =>  4,          # 
+  'nodePort'        =>  11001,      # 
 };
 
 ##
@@ -168,7 +168,6 @@ for ( my $vipNum = 1; $vipNum <= $cfg->{'mkTotal'}; $vipNum++ ) {
 
   ##
   ## Format and print the ltm config 
-  ##
 
   # If this is a new pool, create the config
   if ( $state->{'newPool'} ) {
@@ -184,7 +183,8 @@ for ( my $vipNum = 1; $vipNum <= $cfg->{'mkTotal'}; $vipNum++ ) {
   }
 
 
-  my $vipOpts     = "profiles { http tcp websecurity } policies { pol01-asm_basic }";
+  my $vipOpts     = "profiles { fastL4 }";
+  #my $vipOpts     = "profiles { http tcp websecurity } policies { pol01-asm_basic }";
   #my $vipOpts     = "policies { base_policy } profiles { my2K { context clientside } my512bit_serverssl { context serverside } http tcp websecurity } rules { snat_irule }";
   my $vipCfg      = sprintf("ltm virtual %s { destination %-s:%-7d pool %s %s }",
                     $cur->{'vipName'},

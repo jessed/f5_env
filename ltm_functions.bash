@@ -96,6 +96,7 @@ cloud_env() {
   if [[ -n $3 ]]; then port=$2; else port=22; fi
 
   if [[ $cloud =~ "azure" ]]; then user=azadmin; fi
+  if [[ $host =~ "^ltm*" ]]; then user=root; fi
 
 	# First step: change admin user shell to bash (from tmsh)
   ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"

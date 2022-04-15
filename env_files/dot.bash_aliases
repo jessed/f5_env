@@ -38,4 +38,4 @@ for s in $SOURCES; do
 done
 
 
-# vim: set syntax=sh tabstop=2 expandtab:
+# vim: set bg=dark syntax=sh tabstop=2 expandtab:
