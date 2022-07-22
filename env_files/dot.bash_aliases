@@ -9,7 +9,8 @@ alias ld='ls -ld --color=always'
 #alias vi=vim                                        # convenience alias, need to deprecate
 alias mv='mv -i'                                    # Because I'm becoming a coward...
 alias cp='cp -i'                                    # Because I'm still a coward
-alias s='sudo -E'                                   # convenience alias
+alias s='sudo -E '                                  # convenience alias
+alias svim='sudo vim '
 alias duh='du -hd 1'
 alias last='last | head -20'
 alias grep='grep -i --color=auto -E'
@@ -38,4 +39,4 @@ for s in $SOURCES; do
 done
 
 
-# vim: set bg=dark syntax=sh tabstop=2 expandtab:
+# vim: set bg=dark syntax=bash tabstop=2 expandtab:

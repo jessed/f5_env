@@ -104,7 +104,7 @@ mk_prompt () {
     PS1="${COLOR}${SCRN}\h:\w >${CLR}"
   else
     #PS1="${COLOR}\h:\w >${CLR}"    # My standard prompt
-    PS1="${RED}[${CYAN}\A${RED}]${CLR}\n${COLOR}\h:\w${CLR}\n>"
+    PS1="${RED}[${CYAN}\A${RED}]${CLR}\n${COLOR}\h:\w${CLR}\n$ "
     PS1="${TITLE}$PS1"
   fi
 
@@ -117,9 +117,6 @@ mk_prompt () {
 }
 
 
-# Enable VI-mode if VIMODE=1 is passed in through ssh
-chk_vi_mode
-
 # Using this because UDF instances don't received environment variables sent with 'SendEnv' directive
 set -o vi
 
@@ -127,4 +124,4 @@ set -o vi
 PROMPT_COMMAND=mk_prompt
 
 
-# vim: set syntax=sh tabstop=2 expandtab:
+# vim: set syntax=bash tabstop=2 expandtab:

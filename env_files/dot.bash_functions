@@ -86,46 +86,58 @@ watchhost() {
 # List all interfaces with addresses along with the address and mac
 unset -f addr
 addr() {
-  match="(lo|gif|stf|pop|awdl|bridge|utun|fw|vnic)"
+  addr_list=""
+  match="(lo|gif|stf|pop|awdl|bridge|utun|fw|vnic|veth|cali|tunl)"
 
-  #nics=$(ip link show | awk '/^[[:digit:]]/ {gsub(":"," "); print $2}')
-  nics=$(ifconfig -a | awk '/^[a-z]/ { gsub(":[[:space:]]"," "); print $1}')
+  # figure out if we should use ip or ifconfig
+  if [[ ! -x $(which ifconfig) ]]; then
+    tool="ip"
+    nics=$(ip link show | awk '/^[[:digit:]]/ {gsub(":"," "); print $2}')
+  else
+    tool="ifconfig"
+    nics=$(ifconfig -a | awk '/^[a-z]/ { gsub(":[[:space:]]"," "); print $1}')
+  fi
 
   for n in $nics; do
     declare -a addr
-    if [[ $n =~ $match ]]; then continue
-    else iface=$n
+    # Skip interfaces that match the list above
+    if [[ $n =~ $match ]]; then continue; fi
+
+    # Get address details for interface
+    if [[ $tool =~ "ifconfig" ]]; then info=$(ifconfig $n); fi
+    if [[ $tool =~ "ip" ]]; then info=$(ip addr show dev $n); fi
+
+    info=$(ifconfig $n)
+    if [[ -f /etc/issue ]]; then # linux
+      if [[ -f /etc/redhat-release ]]; then #Redhat
+        m=$(echo "$info" | awk '/ether /{ print $2 }')
+        addr+=($(echo "$info" | awk '/inet /{ print $2 }'))
+      else # Ubuntu
+        m=$(echo "$info" | awk '/ether /{ print $2 }')
+        #addr+=$(echo "$info" | awk '/inet / { print $2 }' | sed 's/addr://')
+        addr+=($(echo "$info" | awk '/inet / { print $2 }'))
+      fi
+    else # mac
+      m=$(echo "$info" | awk '/ether / { print $2}')
+      addr+=($(echo "$info" | awk '/inet / { print $2}'))
     fi
 
-    if [[ -f /etc/issue ]]; then
-      # linux
-      mac=$(ip addr show $iface | awk '/ether/{ print $2 }')
-      addr+=($(ip addr show $iface | awk '/inet /{ print $2 }'))
+    # Only print the interface name if it has at least one address
+    if (( ${#addr[@]} == 0 )); then
+      addr_list="${addr_list}${n}!!!(${m})\n"
     else
-      # mac
-      info=$(ifconfig $iface)
-      mac=$(echo "$info" | awk '/ether / { print $2}')
-      addr+=$(echo "$info" | awk '/inet / { print $2}')
+    # Print the interfaces, IP addresses, and Mac address
+    # Interface name and Mac address should only be present on the first entry
+      count=0
+      for a in ${addr[@]}; do
+        if (( $count == 0 )); then s='!'; fi
+        addr_list="${addr_list}${n}${s}!${a}!(${m})\n"
+        ((count++))
+      done
     fi
-
-    # Only print the interface name if the first address is populated
-    if [[ -n "${addr[0]}" ]]; then
-      s="${iface}"
-      iPad=$(expr 10 - $(echo -n "${s}" | wc -c))
-      printf "%-${iPad}s" ${s}
-    fi
-    # calculate the length of padding to use for the first address output
-    # I want a consistent column depth while still having the first address on the same line
-    # as the interface id
-    aPad=20
-    for a in ${addr[@]} ; do
-      mPad=$(expr 25 - $(echo -n ${a} | wc -c))
-      m="(${mac})"
-      printf "%${iPad}s %-${aPad}s %-${mPad}s\n" " " $a $m
-      iPad=10
-    done
-    unset -v iface info addr mac
+    unset -v info addr m
   done
+  printf "$addr_list" | column -t -s '!'
 }
 
 # List all interfaces and addresses using the 'ip' command
@@ -223,4 +235,4 @@ EOF
 }
 
 
-# vim: set syntax=sh tabstop=2 expandtab:
+# vim: set syntax=bash tabstop=2 expandtab:

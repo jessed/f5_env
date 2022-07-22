@@ -1,7 +1,8 @@
 " source my custom filetypes (syntax highlighting)
 
 set modeline
-set nocompatible
+set modelines=5
+
 set shiftwidth=2
 set softtabstop=2
 set tabstop=2
@@ -79,36 +80,33 @@ hi User6  ctermfg=White
 hi User7  ctermfg=Cyan
 
 
-" Remap F1 to Escape
+" Remap F1 to Escape - stupid F-key layout on advantage
 inoremap  <F1> <Esc>
 
-set backspace=indent,eol,start
 " Fix the backspace key
+set backspace=indent,eol,start
 set t_kb=
 
 " Clear search highlighting after the search
 map <C-X> :let @/=""<CR>
 
-
-" (semi)Intelligent indentation of paragraphs, wrap at text-width, 
-" and more trickery to hopefully make life easier
-"set formatoptions=tcrw2
-" make it easy to enable and disable auto-paragraph
-map <buffer> ,1 :set formatoptions+=a<CR>
-map <buffer> ,2 :set formatoptions-=a<CR>
-map <buffer> ,3 3i <Esc>/)<CR>jB
+" paste options
+set pastetoggle=<F5>
 map <buffer> ,p :set paste<CR>a
+map <buffer> ,n :set nopaste<CR>a
 
 set complete+=k           " scan the files given with the 'dictionary' option
 set autoread              " read open files again when changed outside Vim
 set autowrite             " write a modified buffer on each :next , ...
 set browsedir  =current   " which directory to use for the file browser
 
-"code folding settings 
-" toggle folding with 'za'; fold/unfold everything with 'zM' and 'zR'
-" toggle individual folds with 'zm' and 'zr'
-set foldmethod=indent     " fold based on indent
-set foldnestmax=10        " deepest fold is 10 levels
-set nofoldenable          " don't fold by default
-set foldlevel=1
 
+"
+" Macros
+"
+
+" Clear searchhighlighting
+map <C-X> :let @/=""<CR>
+
+" Collapse blocks to a single line
+let @c='v%:joinkd'

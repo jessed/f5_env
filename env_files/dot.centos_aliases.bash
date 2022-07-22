@@ -36,4 +36,4 @@ alias dli='dnf list installed'
 alias sdds='sudo dnf distro-sync'
 #alias d='dnf '
 
-# vim: set syntax=sh tabstop=2 expandtab:
+# vim: set syntax=bash tabstop=2 expandtab:

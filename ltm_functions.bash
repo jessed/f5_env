@@ -96,10 +96,13 @@ cloud_env() {
   if [[ -n $3 ]]; then port=$2; else port=22; fi
 
   if [[ $cloud =~ "azure" ]]; then user=azadmin; fi
-  if [[ $host =~ "^ltm*" ]]; then user=root; fi
+  local_ve="^ltm*|^vmltm*"
+  if [[ $host =~ $local_ve ]] || [[ $host =~ $local_ve ]]; then user=root; fi
 
 	# First step: change admin user shell to bash (from tmsh)
-  ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"
+  if [[ $user == admin || $user == "azadmin" ]]; then
+    ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"
+  fi
 
   # Update SCP allowed locations
   locations="/shared"
@@ -133,29 +136,18 @@ cloud_env() {
   ssh -p ${port} ${user}@${host} "$cmd1 ; $cmd2 ; $cmd3 ; $cmd4 ; $cmd5 ; $cmd6"
 }
 
-## Update AWS linux host environment
+## Update public cloud linux host environment
 cloud_linux() {
-  if [[ -z "$1" ]]; then
+  if [[ -z $1 ]]; then
     echo "USAGE: ${FUNCNAME[0]} {host} [port] (default: 22) [user] (default: admin)"
     return
   else
     host=$1
   fi
-
-  if [[ -n "$2" ]]; then
-    port=$2
-  else
-    port=22
-  fi
-  if [[ -n $3 ]]; then
-    user=$3
-  else
-    user=admin
-  fi
+  if [[ -n $2 ]]; then port=$2; else port=22; fi
+  if [[ -n $3 ]]; then user=$3; else user=admin; fi
 
   files=$(ls ${HOME}/f5_env/env_files/dot*)
-  files="$files ${HOME}/f5_env/env_files/sudoers"
-  #files="$files ${HOME}/f5_env/env_files/nginx.repo"
 
   # Copy environment files to system with a new name (remove 'dot' from the filenames)
   for f in $files; do
@@ -163,16 +155,8 @@ cloud_linux() {
     scp -P ${port} $f ${host}:${new}
   done
 
-  ssh -p ${port} ${host} 'sudo chmod 440 sudoers'
-  ssh -p ${port} ${host} 'sudo chown root.root sudoers'
-  ssh -p ${port} ${host} 'sudo sed -i -e "s/preserve_hostname: false/preserve_hostname: true/" /etc/cloud/cloud.cfg'
-  ssh -p ${port} ${host} 'sudo mv sudoers /etc'
-  ssh -p ${port} ${host} 'touch ~/.hushlogin'
-  cmd1='sudo chmod 440 sudoers'
-  cmd2='sudo chown root.root sudoers'
-  cmd3='sudo sed -i -e "s/preserve_hostname: false/preserve_hostname: true/" /etc/cloud/cloud.cfg'
-  cmd4='sudo mv sudoers /etc'
-  cmd5='touch .hushlogin'
+  cmd="touch .hushlogin"
+  ssh -p ${port} ${host} "$cmd"
 }
 
 # continually flash the screen after the given number of seconds has elapsed
