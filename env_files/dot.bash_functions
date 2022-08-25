@@ -140,9 +140,53 @@ addr() {
   printf "$addr_list" | column -t -s '!'
 }
 
-# List all interfaces and addresses using the 'ip' command
-unset addr2
+unset -f addr2
 addr2() {
+  match="(lo|gif|stf|pop|awdl|bridge|utun|fw|vnic)"
+
+  #nics=$(ip link show | awk '/^[[:digit:]]/ {gsub(":"," "); print $2}')
+  nics=$(ifconfig -a | awk '/^[a-z]/ { gsub(":[[:space:]]"," "); print $1}')
+
+  for n in $nics; do
+    declare -a addr
+    if [[ $n =~ $match ]]; then continue
+    else iface=$n
+    fi
+
+    if [[ -f /etc/issue ]]; then
+      # linux
+      mac=$(ip addr show $iface | awk '/ether/{ print $2 }')
+      addr+=($(ip addr show $iface | awk '/inet /{ print $2 }'))
+    else
+      # mac
+      info=$(ifconfig $iface)
+      mac=$(echo "$info" | awk '/ether / { print $2}')
+      addr+=$(echo "$info" | awk '/inet / { print $2}')
+    fi
+
+    # Only print the interface name if the first address is populated
+    if [[ -n "${addr[0]}" ]]; then
+      s="${iface}"
+      iPad=$(expr 10 - $(echo -n "${s}" | wc -c))
+      printf "%-${iPad}s" ${s}
+    fi
+    # calculate the length of padding to use for the first address output
+    # I want a consistent column depth while still having the first address on the same line
+    # as the interface id
+    aPad=20
+    for a in ${addr[@]} ; do
+      mPad=$(expr 25 - $(echo -n ${a} | wc -c))
+      m="(${mac})"
+      printf "%${iPad}s %-${aPad}s %-${mPad}s\n" " " $a $m
+      iPad=10
+    done
+    unset -v iface info addr mac
+  done
+}
+
+# List all interfaces and addresses using the 'ip' command
+unset addr3
+addr3() {
   ip -4 -o addr show | awk '{print $2"\t"$4}'
 }
 
