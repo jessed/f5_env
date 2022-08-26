@@ -1,2 +1,4 @@
 
 cfg_scripts/dns_cfg/*.zone
+*.key
+*.pem
