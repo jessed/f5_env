@@ -9,12 +9,12 @@ alias dcla="docker container list --all"
 alias dils="docker image ls"
 
 # Podman
-alias p="podman"
-alias pp="podman ps"
-alias pc="podman container"
-alias pcl="podman container list"
-alias pcla="podman container list --all"
-alias pils="podman image ls"
+alias pm="podman"
+alias pmp="podman ps"
+alias pmc="podman container"
+alias pmcl="podman container list"
+alias pmcla="podman container list --all"
+alias pmils="podman image ls"
 
 
 # vim: set syntax=bash tabstop=2 expandtab:

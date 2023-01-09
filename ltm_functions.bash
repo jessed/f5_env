@@ -96,15 +96,15 @@ cloud_env() {
   if [[ -n $3 ]]; then port=$3; else port=22; fi
 
   if [[ $cloud =~ "azure" ]]; then user=azadmin; fi
-  local_ve="^ltm*|^vmltm*"
+  local_ve="^ltm*|^vmltm*|bigip-k*"
   if [[ $host =~ $local_ve ]] || [[ $host =~ $local_ve ]]; then user=root; fi
 
   printf 'Host: %s\nCloud: %s\nPort: %s\n\n' $host $cloud $port
 
 	# First step: change admin user shell to bash (from tmsh)
-  if [[ $user == admin ]]; then
+#  if [[ $user == admin ]]; then
     ssh -p ${port} ${user}@${host} "modify auth user ${user} shell bash; save sys config"
-  fi
+#  fi
 
   # Update SCP allowed locations
   locations="/shared"
@@ -154,18 +154,18 @@ cloud_linux() {
   # Copy environment files to system with a new name (remove 'dot' from the filenames)
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
-    scp -P ${port} $f ${host}:${new}
+    scp -P ${port} $f ${user}@${host}:${new}
   done
 
   cmd="touch .hushlogin"
-  ssh -p ${port} ${host} "$cmd"
+  ssh -p ${port} ${user}@${host} "$cmd"
 }
 
 # continually flash the screen after the given number of seconds has elapsed
 reminder() {
   if [ -z "$1" ]; then timer=180;
   else
-    if [ $1 -lt 60 ]; then timer=$((1*60))
+    if [ $1 -lt 60 ]; then timer=$(($1*60))
     else timer=$1
     fi
   fi
