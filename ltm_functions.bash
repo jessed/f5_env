@@ -176,7 +176,7 @@ reminder() {
 }
 
 strip_regkeys() {
-  awk '/^Registration/ { print $4 }' $1
+  awk '/^Registration/ { print $4 }' $1 | sort -u
   echo -e "\n"
   tail -6 $1
 }
