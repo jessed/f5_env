@@ -33,7 +33,7 @@ alias conns='netstat -anf inet'
 
 SOURCES=""
 SOURCES="$SOURCES .aws_functions.bash .apt_aliases.bash .virt_aliases.bash .centos_aliases.bash .docker_aliases.bash"
-SOURCES="$SOURCES .k8s_aliases.bash"
+SOURCES="$SOURCES .kube_aliases.bash"
 
 for s in $SOURCES; do
   test -f $HOME/${s} && source $HOME/${s}

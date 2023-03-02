@@ -1,0 +1,8 @@
+# ~/.inputrc
+# man readline for command options
+
+set mark-symlinked-directories on
+set bind-tty-special-chars off
+
+# delete to previous whitespace or forward-slash
+"\C-w":unix-filename-rubout
