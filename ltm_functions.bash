@@ -161,6 +161,37 @@ cloud_linux() {
   ssh -p ${port} ${user}@${host} "$cmd"
 }
 
+## Update BIG-IP Next environment
+cloud_next() {
+  if [[ -z $1 ]]; then
+    echo "USAGE: ${FUNCNAME[0]} {host} [port] (default: 22) [user] (default: admin)"
+    return
+  else
+    host=$1
+  fi
+  if [[ -n $2 ]]; then port=$2; else port=22; fi
+  if [[ -n $3 ]]; then user=$3; else user=admin; fi
+
+  files=""
+  files="$files /${HOME}/f5_env/env_files/dot.bashrc"
+  files="$files /${HOME}/f5_env/env_files/dot.bash_aliases"
+  files="$files /${HOME}/f5_env/env_files/dot.bash_functions"
+  files="$files /${HOME}/f5_env/env_files/dot.kube_aliases.bash"
+  files="$files /${HOME}/f5_env/env_files/dot.inputrc"
+  files="$files /${HOME}/f5_env/env_files/dot.vimrc_next"
+
+  # Copy environment files to system with a new name (remove 'dot' from the filenames)
+  for f in $files; do
+    new=$(basename $f | sed 's/dot//')
+    scp -P ${port} $f ${user}@${host}:${new}
+  done
+
+  #cmd="touch .hushlogin"
+  cmd1="mv .vimrc_next .vimrc"
+  cmd2="sudo ln -s /usr/bin/vim.tiny /usr/bin/vim"
+  ssh -p ${port} ${user}@${host} "$cmd1 ; $cmd2"
+}
+
 # continually flash the screen after the given number of seconds has elapsed
 reminder() {
   if [ -z "$1" ]; then timer=180;

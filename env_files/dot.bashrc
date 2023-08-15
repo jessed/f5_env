@@ -104,8 +104,10 @@ mk_prompt () {
     PS1="${COLOR}${SCRN}\h:\w >${CLR}"
   else
     #PS1="${COLOR}\h:\w >${CLR}"    # My standard prompt
-    PS1="${RED}[${CYAN}\A${RED}]${CLR}\n${COLOR}\h:\w${CLR}\n$ "
-    PS1="${TITLE}$PS1"
+    #PS1="${RED}[${CYAN}\A${RED}]${CLR}\n${COLOR}\h:\w${CLR}\n$ "
+    #PS1="${TITLE}$PS1"
+    # single-line w/timestamp, hostname, and path on prompt
+    PS1="${TITLE}${COLOR}\w${CLR}\n${RED}[${CYAN}\A${RED}]${COLOR} \h${CLR} $ "
   fi
 
   if [[ -f go_env || -f .go_env ]]; then

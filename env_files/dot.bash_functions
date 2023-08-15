@@ -90,7 +90,7 @@ addr() {
   match="(lo|gif|stf|pop|awdl|bridge|utun|fw|vnic|veth|cali|tunl)"
 
   # figure out if we should use ip or ifconfig
-  if [[ ! -x $(which ifconfig) ]]; then
+  if [[ -x $(which ip) ]]; then
     tool="ip"
     nics=$(ip link show | awk '/^[[:digit:]]/ {gsub(":"," "); print $2}')
   else
