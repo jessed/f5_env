@@ -155,6 +155,10 @@ cloud_linux() {
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
     scp -P ${port} $f ${user}@${host}:${new}
+    if [[ $? != 0 ]]; then
+      echo "ERROR: scp command failed for: ${user}@${host}:${new} (username issue?)"
+      return
+    fi
   done
 
   cmd="touch .hushlogin"
