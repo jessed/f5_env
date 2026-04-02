@@ -93,6 +93,7 @@ cloud_env() {
     echo "USAGE: ${FUNCNAME[0]} <ltm_host> [azure|aws|gcp|other] [port]"
     return
   fi
+	if [[ $host =~ "*.udf.f5.com" ]]; then user=root; fi
   if [[ -n $2 ]]; then cloud=$2; else cloud=other; fi
   if [[ -n $3 ]]; then port=$3; else port=22; fi
 
@@ -113,7 +114,9 @@ cloud_env() {
   ssh -p ${port} ${user}@${host} "echo -e $locations >> /config/ssh/scp.whitelist; tmsh restart sys service sshd"
 
   # copy the new environment file into place
-  scp -P ${port} ${ENVFILE} ${VIMRC} ${user}@${host}:/shared
+  #scp -P ${port} ${ENVFILE} ${VIMRC} ${user}@${host}:/shared
+  cat $ENVFILE | ssh -p ${port} ${user}@${host} "cat > /shared/env.ltm"
+  cat $VIMRC | ssh -p ${port} ${user}@${host} "cat > /shared/vimrc.ltm"
   #ssh -p ${port} ${user}@${host} "ln -sf /shared/env.ltm .env.ltm; ln -sf /shared/vimrc.ltm .vimrc"
   cmd1="ln -sf /shared/env.ltm .env.ltm; ln -sf /shared/vimrc.ltm .vimrc"
 
@@ -155,9 +158,11 @@ cloud_linux() {
   # Copy environment files to system with a new name (remove 'dot' from the filenames)
   for f in $files; do
     new=$(basename $f | sed 's/dot//')
-    scp -P ${port} $f ${user}@${host}:${new}
+    #echo "$f -> $new"
+    cat $f | ssh -p $port ${user}@${host} "cat >$new"
     if [[ $? != 0 ]]; then
-      echo "ERROR: scp command failed for: ${user}@${host}:${new} (username issue?)"
+      echo "ERROR: ssh command failed for: ${user}@${host}:${new} (username issue?)"
+      echo "command: cat $f | ssh -p $port ${user}@${host} 'cat >$new'"
       return
     fi
   done
